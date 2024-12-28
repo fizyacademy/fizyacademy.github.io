@@ -2,12 +2,6 @@
 <?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://fizyacademy.github.io/404</loc>
-        <lastmod>2024-12-28</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.5</priority>
-    </url>
-    <url>
         <loc>https://fizyacademy.github.io/account</loc>
         <lastmod>2024-12-28</lastmod>
         <changefreq>yearly</changefreq>
