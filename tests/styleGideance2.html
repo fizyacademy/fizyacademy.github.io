@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: #FAF3E0;
+            color: #333333;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #008080;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            transition: width 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            border-right: 4px solid transparent;
+        }
+
+        .sidebar a {
+            display: block;
+            text-decoration: none;
+            color: #fff;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #DAA520;
+            transform: scale(1.15);
+        }
+
+        .sidebar .logo {
+            font-size: 24px;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            background-color: #FAF3E0;
+            padding: 30px;
+            transition: background-color 0.3s, color 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #008080;
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        /* Toggle Button for Dark/Light Mode */
+        .theme-toggle {
+            cursor: pointer;
+            background-color: #DAA520;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: #c9a13d;
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: #f5f5f5;
+        }
+
+        .sidebar.dark-mode {
+            background-color: #1f1f1f;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+            border-right: 4px solid transparent;
+        }
+
+        .sidebar a.dark-mode {
+            color: #f5f5f5;
+        }
+
+        .sidebar a.dark-mode:hover {
+            background-color: #333333;
+        }
+
+        .header.dark-mode {
+            background-color: #2a2a2a;
+            border-bottom: 4px solid transparent;
+        }
+
+        .main-content.dark-mode {
+            background-color: #1e1e1e;
+            color: #f5f5f5;
+            border-left: 4px solid transparent;
+        }
+
+        .main-content.dark-mode h2 {
+            color: #f5f5f5;
+        }
+
+        .content {
+            padding: 20px;
+            background-color: #008080;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .content.dark-mode {
+            background-color: #015959;
+        }
+
+        .content h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #f5f5f5;
+        }
+
+        .content p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #f5f5f5;
+        }
+
+        /* Box Shadows and Borders for Better Contrast */
+        .header, .sidebar, .main-content {
+            border-color: transparent;
+        }
+
+        .theme-toggle.dark-mode {
+            background-color: #008080;
+        }
+
+        .theme-toggle.dark-mode:hover {
+            background-color: #015959;
+        }
+
+        /* Dark Mode Borders */
+        body.dark-mode .main-content,
+        body.dark-mode .header {
+            border-color: #008080;
+        }
+
+        /* Light Mode Borders */
+        body:not(.dark-mode) .main-content,
+        body:not(.dark-mode) .header {
+            border-color: #DAA520;
+        }
+
+        /* Adjusted Shadows */
+        .header, .sidebar, .main-content {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">fizyAcademy</div>
+            <a href="#" class="dashboard-link">Dashboard</a>
+            <a href="#" class="dashboard-link">Settings</a>
+            <a href="#" class="dashboard-link">Profile</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Dashboard</h1>
+                <button class="theme-toggle">Switch Mode</button>
+            </div>
+
+            <div class="content">
+                <h2>Welcome to Your Dashboard</h2>
+                <p>This is a simple dashboard with improved light and dark modes. Borders are golden in light mode for a touch of elegance, while dark mode focuses on contrast and minimalism.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between light and dark mode
+        document.querySelector('.theme-toggle').addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            document.querySelector('.sidebar').classList.toggle('dark-mode');
+            document.querySelector('.header').classList.toggle('dark-mode');
+            document.querySelector('.main-content').classList.toggle('dark-mode');
+            document.querySelector('.content').classList.toggle('dark-mode');
+            document.querySelectorAll('.sidebar a').forEach(function (link) {
+                link.classList.toggle('dark-mode');
+            });
+            document.querySelector('.theme-toggle').classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+
+</html>

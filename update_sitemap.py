@@ -5,7 +5,7 @@ from datetime import datetime
 root_dir = './'
 
 # Define the base URL of your website
-base_url = 'https://alostaz222.github.io'
+base_url = 'https://fizyacademy.github.io'
 
 # Define the name of the sitemap file
 sitemap_file = os.path.join(root_dir, 'sitemap.xml')
@@ -18,7 +18,13 @@ valid_extensions = ['.html', '.htm']
 ignore_list = [
     'google085c7894048661b1.html',
     'admin/',
-    'myenv/'
+    'myenv/',
+    'venv/',
+    'quiz/admin.html',
+    '404.html',
+    'package.json',
+    'package-lock.json',
+    'tests/'
 ]
 
 # Function to generate the XML for a single URL entry
