@@ -1,4 +1,4 @@
-# robots.txt for https://alostaz222.github.io/
+# robots.txt for https://fizyacademy.github.io/
 # This file controls the access of web crawlers and search engines to various sections of the website.
 
 # Allow access to all content except specified directories and pages
@@ -11,7 +11,7 @@ User-agent: Googlebot
 Disallow:                         # No restrictions for Googlebot
 
 # Sitemap location for search engines
-Sitemap: https://alostaz222.github.io/sitemap.xml
+Sitemap: https://fizyacademy.github.io/sitemap.xml
 
 # Note for crawlers
 # Ensure to follow the guidelines provided by the respective search engines for proper indexing.
