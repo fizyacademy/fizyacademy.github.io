@@ -1,0 +1,28 @@
+# robots.txt for https://fizyacademy.github.io
+
+# Block all crawlers from accessing sensitive parts of the website
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /media/
+Disallow: /venv/
+
+
+# Allow all crawlers to index the public content
+Allow: /css/
+Allow: /js/
+Allow: favicon.ico
+
+# Sitemap location for crawlers
+Sitemap: https://fizyacademy.github.io/sitemap.xml
+
+# Googlebot-specific rules (optional)
+User-agent: Googlebot
+Disallow: /admin/
+
+# Block specific crawlers (optional)
+User-agent: BadBot
+Disallow: /
+
+# Crawl-delay directive to prevent server overload
+Crawl-delay: 10
