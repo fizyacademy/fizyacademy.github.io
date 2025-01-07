@@ -23,6 +23,3 @@ Disallow: /admin/
 # Block specific crawlers (optional)
 User-agent: BadBot
 Disallow: /
-
-# Crawl-delay directive to prevent server overload
-Crawl-delay: 10
