@@ -79,8 +79,8 @@ class SpecialHeader extends HTMLElement {
                             <li><i class="material-icons" id='hideMenuInner'>close</i></li>
                         </div>
                         <div class='headcont'>
-                            <li class="nav"><a href="/">الصفحة الرئيسية</a></li>
-                            <li class="nav"><a href="/sessions">المحاضرات</a></li>
+                            <li class="nav"><a href="./">الصفحة الرئيسية</a></li>
+                            <li class="nav"><a href="./sessions">المحاضرات</a></li>
                             <li class="nav">
                                 <select id="stage">
                                     <option disabled selected>--اختر الصف الدراسي--</option>
@@ -101,8 +101,8 @@ class SpecialHeader extends HTMLElement {
                                     </optgroup>
                                 </select>
                             </li>
-                            <li class="nav"><a href="/pricing">الاسعار</a></li>
-                            <li class="nav"><a href="/contact">تواصل معنا</a></li>
+                            <li class="nav"><a href="./pricing">الاسعار</a></li>
+                            <li class="nav"><a href="./contact">تواصل معنا</a></li>
                         </div>
                         <ul>
                             <!--account-->
@@ -220,8 +220,8 @@ class SpecialLogo extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <div class="upperContainer">
-                <a id="logoContainer" href="/"> 
-                    <span>alostaz</span>
+                <a id="logoContainer" href="./"> 
+                    <span>fizyacademy</span>
                     <img src="logo.png" alt="Logo">
                 </a>
             </div>
@@ -235,7 +235,7 @@ class SpecialFooter extends HTMLElement {
         const year = date.getFullYear();
         this.innerHTML = `
             <footer>
-                <p>alostaz &copy; ${year}. All rights reserved.</p>
+                <p>fizyacademy &copy; ${year}. All rights reserved.</p>
             </footer>
         `;
     }
