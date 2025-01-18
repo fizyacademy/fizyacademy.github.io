@@ -2,7 +2,7 @@
 DirectoryIndex index.html
 
 # Set the custom 404 error page
-ErrorDocument 404 /alostaz/404
+ErrorDocument 404 /fizyacademy/404
 
 # Enable MultiViews option
 Options +MultiViews
@@ -25,7 +25,3 @@ RewriteRule ^([^\.]+)$ $1.xml [NC,L]
 # Redirect requests for .xml files to 404 error
 RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.xml[? ].*$"
 RewriteRule .* - [L,R=404]
-
-AuthType Basic
-AuthName "Restricted Area"
-Require valid-user
