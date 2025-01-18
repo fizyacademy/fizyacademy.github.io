@@ -5,7 +5,7 @@ document.getElementById('loginButton').addEventListener('click', () => {
     const password = document.getElementById('password').value;
     const loginMessage = document.getElementById('loginMessage');
 
-    if (username === 'alostaz' && password === 'alostaz') {
+    if (username === 'fizyacademy' && password === '123456') {
         document.getElementById('loginForm').classList.add('hidden');
         document.getElementById('adminContent').classList.remove('hidden');
         loginMessage.classList.add('hidden');
