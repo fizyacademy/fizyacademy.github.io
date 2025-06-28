@@ -1,0 +1,49 @@
+fizyacademy /
+├── backend
+  ├── .env
+  ├── admin.py
+  ├── app.py
+  ├── auth.py
+  ├── config.py
+  ├── db.py
+  ├── models.py
+  ├── requirements.txt
+  ├── utils.py
+  └── video.py
+├── instance
+  └── database.db
+├── public
+└── src
+  ├── assets
+  ├── components
+    ├── AccountInfo.jsx
+    ├── AdminApproval.jsx
+    ├── Loading.jsx
+    ├── LogoutButton.jsx
+    ├── Navbar.jsx
+    ├── Post.jsx
+    ├── QuizBtn.jsx
+    ├── Sidebar.jsx
+    ├── SidebarToggle.jsx
+    └── SideBtn.jsx
+  └── Pages
+    ├── Admin.jsx
+    ├── Landing.jsx
+    ├── Login.jsx
+    ├── Moderator.jsx
+    ├── Register.jsx
+    └── Student.jsx
+  ├── App.css
+  ├── App.jsx
+  ├── index.css
+  ├── main.jsx
+  └── utils.jsx
+├── .gitignore
+├── app.py
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── project-structure.md
+├── tree.js
+└── vite.config.js
