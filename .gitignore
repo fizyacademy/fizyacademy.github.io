@@ -24,3 +24,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+src/components/BottomNav.jsx
+src/constants/navLinks.js

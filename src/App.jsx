@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Loading from "./components/Loading";
 import { getRole, isAuthenticated } from "./utils";
 import AccountSettings from "./Pages/AccountSettings";
+import UIReferencePage from './Pages/UiReferencePage';
+import BottomNav from './components/BottomNav';
+
 
 
 const Student = lazy(() => import("./Pages/Student"));
@@ -62,9 +65,11 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/account" element={<AccountSettings />} />
+                    <Route path='/ui-reference' element={<UIReferencePage/>} />
                     <Route path="/*" element={RoleComponent} />
                 </Routes>
             </Suspense>
+            <BottomNav />
         </Router>
     );
 }

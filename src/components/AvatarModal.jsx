@@ -15,19 +15,21 @@ const avatars = [
 
 const AvatarModal = ({ currentAvatar, onSelect, onClose }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/10 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl mx-4 p-6">
-        <h2 className="text-2xl font-bold text-center text-teal-700 mb-6">اختيار صورة الحساب</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl w-full max-w-3xl mx-4 p-6 text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-bold text-center text-violet-700 dark:text-violet-300 mb-6">
+          اختيار صورة الحساب
+        </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 justify-items-center">
           {avatars.map((avatar) => (
             <button
               key={avatar.name}
               onClick={() => onSelect(avatar.name)}
-              className={`rounded-full border-4 p-1 transition ${
+              className={`relative rounded-full transition-all duration-200 p-1 shadow ${
                 avatar.name === currentAvatar
-                  ? "border-teal-500"
-                  : "border-transparent hover:border-gray-300"
+                  ? "ring-4 ring-violet-500"
+                  : "hover:ring-2 hover:ring-violet-300 dark:hover:ring-violet-500"
               }`}
             >
               <img
@@ -42,7 +44,7 @@ const AvatarModal = ({ currentAvatar, onSelect, onClose }) => {
         <div className="mt-6 text-center">
           <button
             onClick={onClose}
-            className="text-sm text-gray-600 hover:text-teal-600 underline transition"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400 underline transition"
           >
             إغلاق
           </button>

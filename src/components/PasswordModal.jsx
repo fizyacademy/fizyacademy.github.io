@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import { FiLock, FiCheck, FiX } from "react-icons/fi";
 
 const BASE_URL = "http://localhost:5000";
 
@@ -63,62 +64,57 @@ const PasswordModal = ({ onClose }) => {
     }
   };
 
+  const renderInput = (name, placeholder) => (
+    <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 border border-gray-300 dark:border-gray-600 rounded-md p-3">
+      <span className="text-xl text-violet-600 dark:text-violet-400">
+        <FiLock />
+      </span>
+      <input
+        type="password"
+        name={name}
+        placeholder={placeholder}
+        value={form[name]}
+        onChange={handleChange}
+        className="w-full bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none disabled:text-gray-400"
+        required
+      />
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/10 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-xl font-bold text-center text-teal-700 mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl w-full max-w-md p-6 text-gray-900 dark:text-white">
+        <h2 className="text-xl font-bold text-center text-violet-700 dark:text-violet-300 mb-4">
           تغيير كلمة المرور
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="password"
-            name="current_password"
-            placeholder="كلمة المرور الحالية"
-            value={form.current_password}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-teal-800"
-            required
-          />
-          <input
-            type="password"
-            name="new_password"
-            placeholder="كلمة المرور الجديدة"
-            value={form.new_password}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-teal-800"
-            required
-          />
-          <input
-            type="password"
-            name="confirm_password"
-            placeholder="تأكيد كلمة المرور"
-            value={form.confirm_password}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-teal-800"
-            required
-          />
+          {renderInput("current_password", "كلمة المرور الحالية")}
+          {renderInput("new_password", "كلمة المرور الجديدة")}
+          {renderInput("confirm_password", "تأكيد كلمة المرور")}
 
           {msg && (
-            <p className="text-sm text-center mt-2 text-red-600">{msg}</p>
+            <p className="text-sm text-center mt-2 text-red-600 dark:text-red-400">{msg}</p>
           )}
 
           <div className="flex justify-between items-center mt-4">
             <button
               type="submit"
               disabled={loading}
-              className={`bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md transition ${
+              className={`cursor-pointer flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-md transition font-semibold ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
+              <FiCheck />
               {loading ? "جاري الحفظ..." : "حفظ التغيير"}
             </button>
+
             <button
               type="button"
               onClick={onClose}
-              className="text-gray-500 hover:text-black underline text-sm"
+              className="cursor-pointer flex items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white underline text-sm"
             >
-              إغلاق
+              <FiX /> إغلاق
             </button>
           </div>
         </form>

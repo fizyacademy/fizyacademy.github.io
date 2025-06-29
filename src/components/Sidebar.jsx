@@ -4,96 +4,94 @@ import SidebarToggle from './SidebarToggle';
 import AccountInfo from './AccountInfo';
 import SideBtn from './SideBtn';
 import { Link } from "react-router-dom";
+import { FiSettings, FiLogOut } from "react-icons/fi";
 
+function Sidebar({ isCollapsed, setIsCollapsed }) {
+  const handleLogout = () => {
+    logout();
+    window.location.href = mainPath;
+  };
 
-function Sidebar({isCollapsed, setIsCollapsed}) { 
+  return (
+    <div
+      className={`
+        fixed top-[8vh] h-[92vh] z-50 transition-all duration-500 ease-in-out
+        ${isCollapsed ? "w-[60px]" : "w-[250px]"}
+        bg-white/70 dark:bg-gray-800 backdrop-blur border-e border-gray-300 dark:border-gray-700
+        flex flex-col shadow-xl
+      `}
+    >
+      {/* Toggle */}
+      <SidebarToggle isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-    const handleLogout = () => {
-        logout();
-        window.location.href = mainPath;
-    };
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-4">
+        {/* Account Info */}
+        <Link to="/account" className="w-full block hover:bg-violet-50 dark:hover:bg-gray-800 rounded-xl mx-2 mb-4">
+          <AccountInfo role={role} isCollapsed={isCollapsed} />
+        </Link>
 
-    return (
-        <div 
-            className={`fixed top-[8vh] h-[92vh] bg-gray-900 text-white flex flex-col shadow-2xl 
-            transition-all duration-500 ease-in-out z-50 border-r border-gray-700 
-            ${isCollapsed ? "w-[5vw]" : "w-[20vw]"}`}
-        >
-            {/* Sidebar Toggle */}
-            <SidebarToggle isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+        {/* Nav Items */}
+        <div className="flex flex-col gap-1 px-2">
+          <SideBtn icon="apps" text="الرئيسية" link="/" isCollapsed={isCollapsed} />
 
-            <div className="flex-1 overflow-y-auto">
-                {/* Profile Section (Left-aligned) */}
-                <div className="w-full flex">
-                    <Link to='/account' className="hover:bg-gray-800 w-full flex justify-start p-2 transition-all">
-                        <AccountInfo role={role} isCollapsed={isCollapsed} />
-                    </Link>
-                </div>
+          {role === 'admin' && (
+            <>
+              <SideBtn icon="manage_accounts" text="إدارة المسؤولين" link="/admins" isCollapsed={isCollapsed} />
+              <SideBtn icon="manage_accounts" text="إدارة المشرفين" link="/moderators" isCollapsed={isCollapsed} />
+              <SideBtn icon="group" text="قائمة الطلاب" link="/students" isCollapsed={isCollapsed} />
+              <SideBtn icon="quiz" text="الاختبارات" link="/admin/quizes" isCollapsed={isCollapsed} />
+              <SideBtn icon="assignment" text="الواجبات" link="/admin/homeworks" isCollapsed={isCollapsed} />
+              <SideBtn icon="video_library" text="المحاضرات" link="/video/upload" isCollapsed={isCollapsed} />
+            </>
+          )}
 
-                {/* Navigation Links */}
-                <div className="flex flex-col flex-grow">
-                    <SideBtn icon="apps" text="الرئيسية" link="" isCollapsed={isCollapsed} />
+          {role === 'moderator' && (
+            <>
+              <SideBtn icon="group" text="الطلاب" link="/students" isCollapsed={isCollapsed} />
+              <SideBtn icon="quiz" text="الاختبارات" link="/admin/quizes" isCollapsed={isCollapsed} />
+              <SideBtn icon="assignment" text="الواجبات" link="/admin/homeworks" isCollapsed={isCollapsed} />
+              <SideBtn icon="video_library" text="المحاضرات" link="/admin/sessions" isCollapsed={isCollapsed} />
+            </>
+          )}
 
-                    {role === 'admin' && (
-                        <>
-                            <SideBtn icon="manage_accounts" text="إدارة المسؤولين" link="/admins" isCollapsed={isCollapsed} />
-                            <SideBtn icon="manage_accounts" text="إدارة المشرفين" link="/moderators" isCollapsed={isCollapsed} />
-                            <SideBtn icon="group" text="قائمة الطلاب" link="/students" isCollapsed={isCollapsed} />
-                            <SideBtn icon="quiz" text="الاختبارات" link="/admin/quizes" isCollapsed={isCollapsed} />
-                            <SideBtn icon="assignment" text="الواجبات" link="/admin/homeworks" isCollapsed={isCollapsed} />
-                            <SideBtn icon="video_library" text="المحاضرات" link="/video/upload" isCollapsed={isCollapsed} />
-                        </>
-                    )}
-
-                    {role === 'moderator' && (
-                        <>
-                            <SideBtn icon="group" text="الطلاب" link="/students" isCollapsed={isCollapsed} />
-                            <SideBtn icon="quiz" text="الاختبارات" link="/admin/quizes" isCollapsed={isCollapsed} />
-                            <SideBtn icon="assignment" text="الواجبات" link="/admin/homeworks" isCollapsed={isCollapsed} />
-                            <SideBtn icon="video_library" text="المحاضرات" link="/admin/sessions" isCollapsed={isCollapsed} />
-                        </>
-                    )}
-
-                    {role === 'student' && (
-                        <>
-                            <SideBtn icon="quiz" text="الاختبارات" link="/exams" isCollapsed={isCollapsed} />
-                            <SideBtn icon="assignment" text="الواجبات الدراسية" link="/homeworks" isCollapsed={isCollapsed} />
-                            <SideBtn icon="task" text="النتائج والتقييمات" link="/results" isCollapsed={isCollapsed} />
-                            <SideBtn icon="payments" text="إدارة الاشتراكات" link="/subscriptions" isCollapsed={isCollapsed} />
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {/* Settings and Logout */}
-            <div className="mt-auto flex flex-col items-center pb-4 gap-2">
-                <a 
-                    className={`bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg w-[90%] flex items-center justify-center transition-all`}
-                    href={mainPath + 'settings'}
-                >
-                    <span className="material-symbols-outlined">settings</span>
-                    {!isCollapsed && <span className="ml-2">الإعدادات</span>}
-                </a>
-                <a 
-                    onClick={handleLogout} 
-                    className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-lg w-[90%] flex items-center justify-center transition-all cursor-pointer"
-                >
-                    <span className="material-symbols-outlined">logout</span>
-                    {!isCollapsed && <span className="ml-2">تسجيل الخروج</span>}
-                </a>
-            </div>
+          {role === 'student' && (
+            <>
+              <SideBtn icon="quiz" text="الاختبارات" link="/exams" isCollapsed={isCollapsed} />
+              <SideBtn icon="assignment" text="الواجبات الدراسية" link="/homeworks" isCollapsed={isCollapsed} />
+              <SideBtn icon="task" text="النتائج والتقييمات" link="/results" isCollapsed={isCollapsed} />
+              <SideBtn icon="payments" text="إدارة الاشتراكات" link="/subscriptions" isCollapsed={isCollapsed} />
+            </>
+          )}
         </div>
-    );
+      </div>
+
+      {/* Footer */}
+      <div className="mt-auto p-2 flex flex-col gap-2">
+        <Link
+          to={mainPath + 'settings'}
+          className="flex items-center justify-center gap-2 bg-violet-800/80 dark:bg-violet-800 backdrop-blur rounded-lg px-3 py-2 text-lg text-white dark:text-white hover:bg-violet-700 dark:hover:bg-violet-900 transition"
+        >
+          <FiSettings />
+          {!isCollapsed && <span>الإعدادات</span>}
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg px-3 py-2 text-lg transition cursor-pointer"
+        >
+          <FiLogOut />
+          {!isCollapsed && <span>تسجيل الخروج</span>}
+        </button>
+      </div>
+    </div>
+
+  );
 }
 
 Sidebar.propTypes = {
-    isCollapsed: PropTypes.bool.isRequired,
-    setIsCollapsed: PropTypes.func.isRequired,
-};
-
-SidebarToggle.propTypes = {
-    isCollapsed: PropTypes.bool.isRequired,
-    setIsCollapsed: PropTypes.func.isRequired,
+  isCollapsed: PropTypes.bool.isRequired,
+  setIsCollapsed: PropTypes.func.isRequired,
 };
 
 export default Sidebar;
