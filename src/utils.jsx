@@ -1,3 +1,5 @@
+import { navigate } from "react-router-dom";
+
 const mainPath = "http://localhost:5173/";
 
 const subscription = () => {
@@ -134,7 +136,7 @@ const logout = async () => {
     role = username = stage = userID = coupon = studentPhone = fatherPhone = userCode = referredBy = "";
     points = 0;
 
-    window.location.href = "/login";
+    navigate("/");
 };
 
 // ✅ دالة التسجيل
