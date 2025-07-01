@@ -1,5 +1,3 @@
-import { navigate } from "react-router-dom";
-
 const mainPath = "http://localhost:5173/";
 
 const subscription = () => {
@@ -87,7 +85,12 @@ const setUserData = (userData) => {
         referred_by = "",
     } = userData;
 
+    const savedTheme = localStorage.getItem("theme");
     localStorage.clear();
+    if (savedTheme) {
+    localStorage.setItem("theme", savedTheme);
+    }
+
 
     localStorage.setItem("username", username);
     localStorage.setItem("arabic_name", arabic_name);
@@ -132,11 +135,16 @@ const logout = async () => {
     }
 
     // تنظيف localStorage
+    const savedTheme = localStorage.getItem("theme");
     localStorage.clear();
+    if (savedTheme) {
+    localStorage.setItem("theme", savedTheme);
+    }
+
     role = username = stage = userID = coupon = studentPhone = fatherPhone = userCode = referredBy = "";
     points = 0;
 
-    navigate("/");
+    window.location.href = mainPath;
 };
 
 // ✅ دالة التسجيل
