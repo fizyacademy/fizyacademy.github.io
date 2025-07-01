@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { logout } from "../utils";
 
 const LogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/login");
+    logout(); // Remove JWT
+    navigate("/");
   };
 
   return (

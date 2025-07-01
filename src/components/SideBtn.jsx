@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Icon } from '@iconify/react';
 
 const iconMap = {
-  apps: 'mdi:apps',
+  home: 'mdi:home',
   manage_accounts: 'mdi:account-cog',
   group: 'mdi:account-group',
   quiz: 'mdi:clipboard-text',
@@ -17,7 +17,7 @@ const SideBtn = ({ icon, text, link, isCollapsed }) => {
   return (
     <Link
       to={link}
-      className={`flex items-center gap-3 p-3 rounded-xl transition-all text-gray-900 dark:text-white hover:bg-violet-100 dark:hover:text-violet-500 dark:hover:bg-gray-800 ${
+      className={`flex items-center gap-3 p-3 rounded-xl transition-all text-gray-900 dark:text-white hover:text-violet-500 ${
         isCollapsed ? "justify-center" : ""
       }`}
     >

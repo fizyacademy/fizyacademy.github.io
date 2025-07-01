@@ -5,7 +5,6 @@ import Loading from "./components/Loading";
 import { getRole, isAuthenticated } from "./utils";
 import AccountSettings from "./Pages/AccountSettings";
 import UIReferencePage from './Pages/UiReferencePage';
-import BottomNav from './components/BottomNav';
 
 
 
@@ -69,7 +68,6 @@ function App() {
                     <Route path="/*" element={RoleComponent} />
                 </Routes>
             </Suspense>
-            <BottomNav />
         </Router>
     );
 }

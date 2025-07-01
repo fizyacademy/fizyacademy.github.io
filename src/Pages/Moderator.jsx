@@ -4,257 +4,87 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Post from "../components/Post";
 import AccountInfo from "../components/AccountInfo";
+import MobileBottomNav from "../components/MobileBottomNav";
 
 function Moderator() {
-    const [isCollapsed, setIsCollapsed] = useState(false);
-    
-    return(
-        <div className="App w-full h-[100vh] bg-gray-200 overflow-y-auto overflow-x-hidden relative">
-        <Navbar />
-        <div className="flex flex-col sm:flex-row justify-between gap-7 m-0">
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  return (
+    <div className="w-full min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white">
+      <Navbar />
+
+      <div className="flex pt-[8vh]">
         <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-        <div className={`flex flex-col gap-7 left-0 top-[8vh] absolute p-7 ${isCollapsed ? "w-[95vw]" : "w-[80vw]"}`}>
-            <WidgetCont>
-                <Post
-                    title={"الحساب (مشرف)"}
-                    body=""
-                    className={"col-span-4 row-span-2"}
-                    container={true}
-                    showToggle={true}
-                >
-                    <AccountInfo/>
-                </Post>
-            </WidgetCont>
 
-            <div className="bg-gray-50 rounded-2xl flex flex-col p-3">
-                <select name="" id="" className="bg-gray-50 rounded-2xl  text-black outline-none cursor-pointer">
-                        <option value="1" className="bg-gray-50">الكل</option>
-                        <option value="1" className="bg-gray-50">الصف الأول الثانوي</option>
-                        <option value="1" className="bg-gray-50">الصف الثاني الثانوي</option>
-                        <option value="1" className="bg-gray-50">الصف الثالث الثانوي</option>
-                </select>
-            </div>
+        <main
+          className={`flex-1 transition-all duration-500 p-4 md:p-6 lg:p-8 space-y-6 pb-24 md:pb-6 ${
+            isCollapsed ? "md:mr-[60px]" : "md:mr-[250px]"
+          }`}
+        >
+          <WidgetCont>
+            <Post
+              title="الحساب (مشرف)"
+              className="col-span-4 row-span-2"
+              container
+              showToggle
+            >
+              <AccountInfo />
+            </Post>
+          </WidgetCont>
 
-            <WidgetCont>
-                <Post
-                    title="الطلاب"
-                    body=""
-                    className={"col-span-2 row-span-2"}
-                    showToggle={true}
-                    container={true}
-                >
-                    <table>
-                        <thead className="bg-gray-300">
-                            <tr>
-                                <th>الاسم</th>
-                                <th>الصف</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center">
-                            <tr>
-                                <td>طالب 1</td>
-                                <td>الثالث الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 2</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 3</td>
-                                <td>الثالث الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 4</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 5</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 6</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 7</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 8</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 9</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                            <tr>
-                                <td>طالب 10</td>
-                                <td>الثاني الثانوي</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Post>
-                <Post
-                    title="الطلاب المتفوقين"
-                    body=""
-                    className={"col-span-2 row-span-2"}
-                    container={true}
-                >
-                    <table>
-                        <thead className="bg-gray-300">
-                            <tr>
-                                <th>اسم الطالب</th>
-                                <th>التقييم الاجمالي</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center">
-                            <tr>
-                                <td>طالب 1</td>
-                                <td>100%</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">محادثة</a></td>
-                            </tr>
-                            <tr>
-                                <td>طالب 2</td>
-                                <td>99%</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">محادثة</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Post>
-            </WidgetCont>
-            <WidgetCont>
-                <Post
-                    title="الطلاب المتوسطين"
-                    body=""
-                    className={"col-span-2 row-span-2"}
-                    container={true}
-                >
-                    <table>
-                        <thead className="bg-gray-300">
-                            <tr>
-                                <th>اسم الطالب</th>
-                                <th>التقييم الاجمالي</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center">
-                            <tr>
-                                <td>طالب 4</td>
-                                <td>60%</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">محادثة</a></td>
-                            </tr>
-                            <tr>
-                                <td>طالب 3</td>
-                                <td>50%</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">محادثة</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Post>
-                <Post
-                    title="الطلاب الضعاف"
-                    body=""
-                    className={"col-span-2 row-span-2"}
-                    container={true}
-                >
-                    <table>
-                        <thead className="bg-gray-300">
-                            <tr>
-                                <th>اسم الطالب</th>
-                                <th>التقييم الاجمالي</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center">
-                            <tr>
-                                <td>طالب 6</td>
-                                <td>40%</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">محادثة</a></td>
-                            </tr>
-                            <tr>
-                                <td>طالب 7</td>
-                                <td>20%</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">محادثة</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Post>
-            </WidgetCont>
-            <WidgetCont>
-                <Post
-                    title="الاختبارات"
-                    body=""
-                    className={"col-span-2 row-span-2"}
-                    container={true}
-                    showToggle={true}
-                >
-                    <table>
-                        <thead className="bg-gray-300">
-                            <tr>
-                                <th>العنوان</th>
-                                <th>الصف</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center">
-                            <tr>
-                                <td>الإختبار الأول</td>
-                                <td>الثالث الثانوي</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">الإجراءات</a></td>
-                            </tr>
-                            <tr>
-                                <td>الإختبار الأول</td>
-                                <td>الأول الثانوي</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">الإجراءات</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Post>
-                <Post
-                    title="الواجبات"
-                    body=""
-                    className={"col-span-2 row-span-2"}
-                    container={true}
-                    showToggle={true}
-                >
-                    <table>
-                        <thead className="bg-gray-300">
-                            <tr>
-                                <th>العنوان</th>
-                                <th>الصف</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center">
-                            <tr>
-                                <td>الواجب الأول</td>
-                                <td>الثالث الثانوي</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">الإجراءات</a></td>
-                            </tr>
-                            <tr>
-                                <td>الواجب الأول</td>
-                                <td>الأول الثانوي</td>
-                                <td><a className="text-blue-800 hover:text-blue-950 cursor-pointer">الإجراءات</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Post>
-            </WidgetCont>
-        </div>
-        </div>
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-3">
+            <select className="w-full bg-transparent border-none outline-none text-gray-900 dark:text-white cursor-pointer">
+              <option className="bg-white dark:bg-gray-800">الكل</option>
+              <option className="bg-white dark:bg-gray-800">الصف الأول الثانوي</option>
+              <option className="bg-white dark:bg-gray-800">الصف الثاني الثانوي</option>
+              <option className="bg-white dark:bg-gray-800">الصف الثالث الثانوي</option>
+            </select>
+          </div>
+
+          <WidgetCont>
+            <Post title="الطلاب" className="col-span-2 row-span-2" container showToggle>
+              {/* جدول الطلاب */}
+            </Post>
+            <Post title="الطلاب المتفوقين" className="col-span-2 row-span-2" container>
+              {/* جدول المتفوقين */}
+            </Post>
+          </WidgetCont>
+
+          <WidgetCont>
+            <Post title="الطلاب المتوسطين" className="col-span-2 row-span-2" container>
+              {/* جدول المتوسطين */}
+            </Post>
+            <Post title="الطلاب الضعاف" className="col-span-2 row-span-2" container>
+              {/* جدول الضعاف */}
+            </Post>
+          </WidgetCont>
+
+          <WidgetCont>
+            <Post title="الاختبارات" className="col-span-2 row-span-2" container showToggle>
+              {/* جدول الاختبارات */}
+            </Post>
+            <Post title="الواجبات" className="col-span-2 row-span-2" container showToggle>
+              {/* جدول الواجبات */}
+            </Post>
+          </WidgetCont>
+        </main>
+      </div>
+
+      <MobileBottomNav />
     </div>
-    )
+  );
 }
 
-function WidgetCont({children}) {
-    return (
-        <div className={"grid grid-cols-1 grid-cols-[1fr 1fr 1fr 1fr] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid-rows-2 overflow-y-hidden gap-6 z-0 max-h-[40vh]"}>{children}</div>
-    )
+function WidgetCont({ children }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {children}
+    </div>
+  );
 }
 
 WidgetCont.propTypes = {
-    children: PropTypes.node,
+  children: PropTypes.node,
 };
 
-export default Moderator
+export default Moderator;

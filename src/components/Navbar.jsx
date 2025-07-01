@@ -1,13 +1,14 @@
 import { FiLogOut } from 'react-icons/fi';
 import { mainPath, role, logout } from '../utils';
 import ThemeToggle from './ThemeToggle';
-
+import { useNavigate } from 'react-router-dom';
 function Navbar() {
+  const navigate = useNavigate();
   const isAuthenticated = role; // Check if user is logged in
 
   const handleLogout = () => {
     logout(); // Remove JWT
-    window.location.href = mainPath; // Redirect to home
+    navigate("/");
   };
 
   return (
@@ -17,30 +18,20 @@ function Navbar() {
         Fizyacademy<span className="text-xs text-amber-500">.com</span>
       </a>
 
-      {/* Navigation (for students only) */}
-      {role === "student" && (
-        <nav className="hidden md:flex gap-6 font-medium text-sm">
-          <a href={mainPath} className="hover:text-violet-700 dark:hover:text-violet-400">الصفحة الرئيسية</a>
-          <a href={`${mainPath}sessions`} className="hover:text-violet-700 dark:hover:text-violet-400">المحاضرات</a>
-          <a href={`${mainPath}pricing`} className="hover:text-violet-700 dark:hover:text-violet-400">الأسعار</a>
-          <a href={`${mainPath}contact`} className="hover:text-violet-700 dark:hover:text-violet-400">تواصل معنا</a>
-        </nav>
-      )}
-
       {/* Theme & Auth */}
       <div className="flex items-center gap-3 md:gap-4">
         <ThemeToggle />
         {isAuthenticated === "guest" ? (
           <a
             href={`${mainPath}login`}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm md:text-base transition"
+            className="bg-violet-500 hover:bg-violet-600 text-white px-3 py-1.5 rounded-md text-sm md:text-base transition"
           >
             تسجيل الدخول
           </a>
         ) : (
           <button
             onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-md text-sm md:text-base transition cursor-pointer"
+            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm md:text-base transition cursor-pointer"
           >
             <div className='flex items-center gap-2'>
                 تسجيل الخروج

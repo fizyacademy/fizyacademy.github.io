@@ -143,7 +143,7 @@ const AccountSettings = () => {
             }}
             inputClass="!pl-[0px] !w-full !bg-transparent !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none disabled:!text-gray-400 disabled:!cursor-default"
             containerClass="!w-full !bg-transparent !border-none !shadow-none"
-            buttonClass="!bg-transparent !border-none mr-5"
+            buttonClass="!bg-transparent !border-none mr-5 cursor-pointer disabled:cursor-default"
             dropdownClass="!bg-white dark:!bg-gray-700 !text-gray-800 dark:!text-white"
             dropdownStyle={{
               position: "absolute",
@@ -178,7 +178,7 @@ const AccountSettings = () => {
           value={formData.stage}
           onChange={handleChange}
           disabled={!editFields.stage}
-          className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none disabled:text-gray-400"
+          className="cursor-pointer disabled:cursor-default w-full bg-transparent text-gray-800 dark:text-white focus:outline-none disabled:text-gray-400"
         >
           <option value="">اختر المرحلة</option>
           {stageOptions.map((s) => (
@@ -215,7 +215,7 @@ const AccountSettings = () => {
               alt="avatar"
               className="w-32 h-32 rounded-full border-4 border-violet-600"
             />
-            <div className="absolute inset-0 rounded-full bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+            <div className="absolute inset-0 rounded-full bg-black/70 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
               <span className="text-white">تغيير</span>
             </div>
           </div>

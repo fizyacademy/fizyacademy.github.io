@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { FiLock, FiCheck, FiX } from "react-icons/fi";
+import { FiLock, FiCheck, FiX, FiEye, FiEyeOff } from "react-icons/fi";
+
 
 const BASE_URL = "http://localhost:5000";
 
@@ -64,20 +65,35 @@ const PasswordModal = ({ onClose }) => {
     }
   };
 
+const [showPassword, setShowPassword] = useState(false);
+
   const renderInput = (name, placeholder) => (
-    <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 border border-gray-300 dark:border-gray-600 rounded-md p-3">
-      <span className="text-xl text-violet-600 dark:text-violet-400">
-        <FiLock />
-      </span>
-      <input
-        type="password"
-        name={name}
-        placeholder={placeholder}
-        value={form[name]}
-        onChange={handleChange}
-        className="w-full bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none disabled:text-gray-400"
-        required
-      />
+    <div>
+      <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
+        كلمة المرور
+      </label>
+
+      <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 border border-gray-300 dark:border-gray-600 rounded-md p-3">
+        <span className="text-xl text-violet-600 dark:text-violet-400">
+          <FiLock />
+        </span>
+        <input
+          type={showPassword ? "text" : "password"}
+          name={name}
+          placeholder={placeholder}
+          value={form[name]}
+          onChange={handleChange}
+          className="w-full bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none disabled:text-gray-400"
+          required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="text-violet-600 dark:text-violet-400 focus:outline-none cursor-pointer"
+          >
+            {showPassword ? <FiEyeOff /> : <FiEye />}
+          </button>
+      </div>
     </div>
   );
 

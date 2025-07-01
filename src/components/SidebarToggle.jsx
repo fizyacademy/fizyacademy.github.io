@@ -10,9 +10,9 @@ const SidebarToggle = ({ isCollapsed, setIsCollapsed }) => {
       onClick={() => setIsCollapsed(!isCollapsed)}
     >
       {isCollapsed ? (
-        <FiChevronRight className="text-xl" />
-      ) : (
         <FiChevronLeft className="text-xl" />
+      ) : (
+        <FiChevronRight className="text-xl" />
       )}
     </button>
   );

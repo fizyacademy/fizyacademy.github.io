@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { mainPath, role, logout } from '../utils';
 import SidebarToggle from './SidebarToggle';
@@ -5,12 +6,35 @@ import AccountInfo from './AccountInfo';
 import SideBtn from './SideBtn';
 import { Link } from "react-router-dom";
 import { FiSettings, FiLogOut } from "react-icons/fi";
+import MobileBottomNav from './MobileBottomNav';
 
 function Sidebar({ isCollapsed, setIsCollapsed }) {
+  const [showSidebar, setShowSidebar] = useState(true);
+
+  // ✅ راقب حجم الشاشة وغيّر العرض حسب المساحة المتوفرة
+  useEffect(() => {
+    const handleResize = () => {
+      // لو العرض أقل من 768 بيكسل اخفي السايدبار
+      if (window.innerWidth < 768) {
+        setShowSidebar(false);
+      } else {
+        setShowSidebar(true);
+      }
+    };
+
+    handleResize(); // نفذها مرة مبدئياً
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleLogout = () => {
     logout();
     window.location.href = mainPath;
   };
+
+  // ✅ لو السايدبار مش ظاهر، رجّع الـ Mobile Nav
+  if (!showSidebar) return <MobileBottomNav />;
 
   return (
     <div
@@ -26,14 +50,12 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-4">
-        {/* Account Info */}
         <Link to="/account" className="w-full block hover:bg-violet-50 dark:hover:bg-gray-800 rounded-xl mx-2 mb-4">
           <AccountInfo role={role} isCollapsed={isCollapsed} />
         </Link>
 
-        {/* Nav Items */}
         <div className="flex flex-col gap-1 px-2">
-          <SideBtn icon="apps" text="الرئيسية" link="/" isCollapsed={isCollapsed} />
+          <SideBtn icon="home" text="الرئيسية" link="/" isCollapsed={isCollapsed} />
 
           {role === 'admin' && (
             <>
@@ -70,7 +92,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
       <div className="mt-auto p-2 flex flex-col gap-2">
         <Link
           to={mainPath + 'settings'}
-          className="flex items-center justify-center gap-2 bg-violet-800/80 dark:bg-violet-800 backdrop-blur rounded-lg px-3 py-2 text-lg text-white dark:text-white hover:bg-violet-700 dark:hover:bg-violet-900 transition"
+          className="flex items-center justify-center gap-2 bg-violet-800/80 dark:bg-violet-800 backdrop-blur rounded-lg px-3 py-2 text-lg text-white hover:bg-violet-700 dark:hover:bg-violet-900 transition"
         >
           <FiSettings />
           {!isCollapsed && <span>الإعدادات</span>}
@@ -85,7 +107,6 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
         </button>
       </div>
     </div>
-
   );
 }
 
