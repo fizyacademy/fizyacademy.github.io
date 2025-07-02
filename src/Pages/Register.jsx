@@ -9,6 +9,8 @@ import {
   FiUsers,
   FiLock,
   FiCheck,
+  FiEye,
+  FiEyeOff,
 } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
 
@@ -24,6 +26,7 @@ function Register() {
   const [role, setRole] = useState("student");
   const [gender, setGender] = useState("male");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -73,7 +76,7 @@ function Register() {
     }
   };
 
-  const renderInput = (label, icon, type, value, onChange) => (
+  const renderInput = (label, icon, fieldType, value, onChange) => (
     <div>
       <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
         {label}
@@ -81,12 +84,21 @@ function Register() {
       <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
         <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
         <input
-          type={type}
+          type={fieldType === "password" ? (showPassword ? "text" : "password") : fieldType}
           value={value}
           onChange={onChange}
           required
           className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none"
         />
+        {fieldType === "password" && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="text-violet-600 dark:text-violet-400 focus:outline-none cursor-pointer"
+          >
+            {showPassword ? <FiEyeOff /> : <FiEye />}
+          </button>
+        )}
       </div>
     </div>
   );
