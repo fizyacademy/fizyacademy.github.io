@@ -18,14 +18,14 @@ class User(db.Model):
     stage = db.Column(db.String(20))
     student_phone = db.Column(db.String(20), unique=True)
     father_phone = db.Column(db.String(20))
-    coupon_code = db.Column(db.String(20), unique=True)  # ✅ فريد
-    referred_by = db.Column(db.String(20))  # ✅ يشير إلى الكوبون المستخدم
-    points = db.Column(db.Integer, default=0)  # ✅ نقاط المستخدم
-    user_code = db.Column(db.String(10), unique=True)  # ✅ للبحث من الدعم
+    coupon_code = db.Column(db.String(20), unique=True)
+    referred_by = db.Column(db.String(20))
+    points = db.Column(db.Integer, default=0)
+    user_code = db.Column(db.String(10), unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_approved = db.Column(db.Boolean, default=False)
-    gender = db.Column(db.String(10))  # "male" أو "female"
-    avatar = db.Column(db.String(50))  # مثل: "boy_1", "girl_2"
+    gender = db.Column(db.String(10))
+    avatar = db.Column(db.String(50))
 
 
     def to_dict(self):
