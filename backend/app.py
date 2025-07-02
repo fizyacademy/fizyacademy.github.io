@@ -33,6 +33,7 @@ def create_app():
         if not User.query.filter_by(username="admin").first():
             default_admin = User(
                 username="admin",
+                arabic_name="بكر محمد حسين",
                 password=generate_password_hash("admin"),
                 role="admin",
                 gender="male",
@@ -45,11 +46,6 @@ def create_app():
     return app
 
 app = create_app()
-
-# ✅ تقديم ملفات الفيديو من static/videos
-@app.route("/videos/<path:filename>")
-def serve_video(filename):
-    return send_from_directory("backend/static/videos", filename)
 
 if __name__ == "__main__":
     app.run(debug=True)

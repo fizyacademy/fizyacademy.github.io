@@ -47,30 +47,3 @@ class User(db.Model):
             "avatar": self.avatar,
             "created_at": self.created_at.isoformat()
         }
-
-class Video(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    video_code = db.Column(db.String(20), unique=True, nullable=False)  # مثل #123456789012345
-    title = db.Column(db.String(200), nullable=False)
-    stage = db.Column(db.String(20), nullable=False)
-    term = db.Column(db.String(10), nullable=False)  # '1st' أو '2nd'
-    lecture_name = db.Column(db.String(100), nullable=False)
-    section_name = db.Column(db.String(100), nullable=True)
-    order_in_section = db.Column(db.Integer)
-    video_path = db.Column(db.String(300), nullable=False)  # مسار الفيديو في الاستضافة
-    slug = db.Column(db.String(200), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "video_code": self.video_code,
-            "slug": self.slug,
-            "title": self.title,
-            "stage": self.stage,
-            "term": self.term,
-            "lecture_name": self.lecture_name,
-            "section_name": self.section_name,
-            "order_in_section": self.order_in_section,
-            "video_path": self.video_path
-        }

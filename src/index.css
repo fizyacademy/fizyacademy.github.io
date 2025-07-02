@@ -31,17 +31,23 @@
   background-color: transparent !important;
 }
 
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  caret-color: inherit !important;
+}
 
+:root input:-webkit-autofill,
+:root textarea:-webkit-autofill,
+:root select:-webkit-autofill {
+  -webkit-text-fill-color: #1f2937 !important;
+}
 
-/* @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-} */
+.dark input:-webkit-autofill,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff !important;
+}
