@@ -3,10 +3,10 @@ import {
   FiUser,
   FiMail,
   FiPhone,
-  FiUsers,
   FiCheck,
   FiEdit,
   FiLock,
+  FiBook,
 } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import PhoneInput from "react-phone-input-2";
@@ -14,14 +14,12 @@ import "react-phone-input-2/lib/style.css";
 import PasswordModal from "../components/PasswordModal";
 import AvatarModal from "../components/AvatarModal";
 import Loading from "../components/Loading";
-import ThemeToggle from "../components/ThemeToggle"; // ✅ استيراد السويتش
+import ThemeToggle from "../components/ThemeToggle";
+import CustomSelect from "../components/CustomSelect";
 
 const BASE_URL = "http://localhost:5000";
 
 const stageOptions = [
-  { value: "1st_prep", label: "الصف الأول الإعدادي" },
-  { value: "2nd_prep", label: "الصف الثاني الإعدادي" },
-  { value: "3rd_prep", label: "الصف الثالث الإعدادي" },
   { value: "1st_sec", label: "الصف الأول الثانوي" },
   { value: "2nd_sec", label: "الصف الثاني الثانوي" },
   { value: "3rd_sec", label: "الصف الثالث الثانوي" },
@@ -103,7 +101,7 @@ const AccountSettings = () => {
   const renderInput = (name, label, icon, type = "text") => (
     <div>
       <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
-      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
+      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
         <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
         <input
           type={type}
@@ -111,16 +109,19 @@ const AccountSettings = () => {
           value={formData[name]}
           onChange={handleChange}
           disabled={!editFields[name]}
-          className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none disabled:text-gray-400"
+          className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none disabled:text-gray-400 py-3"
         />
         {isEditable(name) && (
-          <button
-            type="button"
-            onClick={() => toggleEdit(name)}
-            className="text-sm text-blue-600 underline cursor-pointer"
-          >
-            {editFields[name] ? <IoClose /> : <FiEdit />}
-          </button>
+          <>
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <button
+              type="button"
+              onClick={() => toggleEdit(name)}
+              className="text-sm text-blue-600 underline cursor-pointer"
+            >
+              {editFields[name] ? <IoClose /> : <FiEdit />}
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -129,7 +130,7 @@ const AccountSettings = () => {
   const renderPhone = (field, label, icon) => (
     <div>
       <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
-      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-2 shadow-inner">
+      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-2 shadow-inner">
         <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
         <div className="w-full">
           <PhoneInput
@@ -141,7 +142,7 @@ const AccountSettings = () => {
               required: true,
               disabled: !editFields[field],
             }}
-            inputClass="!pl-[0px] !w-full !bg-transparent !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none disabled:!text-gray-400 disabled:!cursor-default"
+            inputClass="!pl-[0px] !w-full !bg-transparent !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none disabled:!text-gray-400 disabled:!cursor-default !py-6"
             containerClass="!w-full !bg-transparent !border-none !shadow-none"
             buttonClass="!bg-transparent !border-none mr-5 cursor-pointer disabled:cursor-default"
             dropdownClass="!bg-white dark:!bg-gray-700 !text-gray-800 dark:!text-white"
@@ -154,40 +155,32 @@ const AccountSettings = () => {
           />
         </div>
         {isEditable(field) && (
-          <button
-            type="button"
-            onClick={() => toggleEdit(field)}
-            className="text-sm text-blue-600 underline cursor-pointer pl-[5px]"
-          >
-            {editFields[field] ? <IoClose /> : <FiEdit />}
-          </button>
+          <>
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <button
+              type="button"
+              onClick={() => toggleEdit(field)}
+              className="text-sm text-blue-600 underline cursor-pointer pl-[5px]"
+              >
+              {editFields[field] ? <IoClose /> : <FiEdit />}
+            </button>
+          </>
         )}
       </div>
     </div>
   );
 
-  const renderStage = () => (
-    <div>
-      <label className="block mb-1 text-gray-800 dark:text-white">المرحلة الدراسية</label>
-      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-4 shadow-inner">
-        <span className="text-xl text-violet-600 dark:text-violet-400">
-          <FiUsers />
-        </span>
-        <select
-          name="stage"
-          value={formData.stage}
-          onChange={handleChange}
-          disabled={!editFields.stage}
-          className="cursor-pointer disabled:cursor-default w-full bg-transparent text-gray-800 dark:text-white focus:outline-none disabled:text-gray-400"
-        >
-          <option value="">اختر المرحلة</option>
-          {stageOptions.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-        {isEditable("stage") && (
+const renderStage = () => (
+  <div>
+    <label className="block mb-1 text-gray-800 dark:text-white">المرحلة الدراسية</label>
+    <CustomSelect
+      value={formData.stage}
+      onChange={(val) => setFormData({ ...formData, stage: val })}
+      options={stageOptions}
+      icon={<FiBook />}
+      isDisabled={!editFields.stage}
+      editButton={
+        isEditable("stage") && (
           <button
             type="button"
             onClick={() => toggleEdit("stage")}
@@ -195,10 +188,13 @@ const AccountSettings = () => {
           >
             {editFields["stage"] ? <IoClose /> : <FiEdit />}
           </button>
-        )}
-      </div>
-    </div>
-  );
+        )
+      }
+    />
+  </div>
+);
+
+
 
   if (!user) return <Loading />;
 

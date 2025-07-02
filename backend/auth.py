@@ -45,6 +45,12 @@ def register():
 
     if data.get("student_phone") and User.query.filter_by(student_phone=data["student_phone"]).first():
         return jsonify({"message": "رقم الطالب مستخدم بالفعل"}), 400
+    
+    # تحقق إن رقم ولي الأمر مختلف عن رقم الطالب
+    if data.get("student_phone") and data.get("father_phone"):
+        if data["student_phone"] == data["father_phone"]:
+            return jsonify({"message": "رقم الطالب لا يجب أن يطابق رقم ولي الأمر"}), 400
+
 
     # تحقق من الطول الأدنى لكلمة المرور
     if len(data["password"]) < 6:

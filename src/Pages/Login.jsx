@@ -54,7 +54,7 @@ function Login() {
             <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
               اسم المستخدم
             </label>
-            <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
+            <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
               <span className="text-xl text-violet-600 dark:text-violet-400">
                 <FiUser />
               </span>
@@ -64,7 +64,7 @@ function Login() {
                 value={username}
                 onChange={(e) => setUser(e.target.value)}
                 required
-                className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none"
+                className="w-full bg-transparent py-3 text-gray-800 dark:text-white focus:outline-none"
               />
             </div>
           </div>
@@ -74,7 +74,7 @@ function Login() {
             <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
               كلمة المرور
             </label>
-            <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
+            <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
               <span className="text-xl text-violet-600 dark:text-violet-400">
                 <FiLock />
               </span>
@@ -84,7 +84,7 @@ function Login() {
                 value={password}
                 onChange={(e) => setPass(e.target.value)}
                 required
-                className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none"
+                className="w-full bg-transparent py-3 text-gray-800 dark:text-white focus:outline-none"
               />
               <button
                 type="button"

@@ -6,13 +6,14 @@ import {
   FiUser,
   FiMail,
   FiPhone,
-  FiUsers,
+  FiBook,
   FiLock,
   FiCheck,
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
+import CustomSelect from "../components/CustomSelect";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -20,7 +21,7 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [stage, setStage] = useState("1st_prep");
+  const [stage, setStage] = useState("1st_sec");
   const [studentPhone, setStudentPhone] = useState("");
   const [fatherPhone, setFatherPhone] = useState("");
   const [role, setRole] = useState("student");
@@ -81,14 +82,14 @@ function Register() {
       <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
         {label}
       </label>
-      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
+      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
         <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
         <input
           type={fieldType === "password" ? (showPassword ? "text" : "password") : fieldType}
           value={value}
           onChange={onChange}
           required
-          className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none"
+          className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none py-3"
         />
         {fieldType === "password" && (
           <button
@@ -106,7 +107,7 @@ function Register() {
   const renderPhone = (value, onChange, name, label) => (
   <div>
     <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
-    <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-2 shadow-inner">
+    <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-2 shadow-inner">
       <span className="text-xl text-violet-600 dark:text-violet-400">
         <FiPhone />
       </span>
@@ -119,7 +120,7 @@ function Register() {
             name,
             required: true,
           }}
-          inputClass="!pl-[0px] !w-full !bg-transparent !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none"
+          inputClass="!pl-[0px] !w-full !bg-transparent py-6 !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none"
           containerClass="!w-full !bg-transparent !border-none !shadow-none"
           buttonClass="!bg-transparent !border-none mr-5 hover:!bg-transparent focus:!bg-transparent active:!bg-transparent"
           dropdownClass="!bg-white dark:!bg-gray-700 !text-gray-800 dark:!text-white"
@@ -156,40 +157,32 @@ function Register() {
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* الدور */}
-            <div>
-              <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
-                اختر الدور
-              </label>
-              <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full outline-none bg-transparent text-gray-800 dark:text-white focus:outline-none cursor-pointer"
-                >
-                <option value="student">طالب</option>
-                <option value="moderator">مشرف</option>
-                <option value="admin">مدير</option>
-              </select>
-            </div>
-            </div>
+            <CustomSelect
+              label="اختر الدور"
+              value={role}
+              onChange={setRole}
+              placeholder="اختر الدور"
+              options={[
+                { value: "student", label: "طالب" },
+                { value: "moderator", label: "مشرف" },
+                { value: "admin", label: "مدير" },
+              ]}
+            />
 
             {/* الجنس */}
-            <div>
-              <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
-                الجنس
-              </label>
-              <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                className="w-full outline-none bg-transparent text-gray-800 dark:text-white focus:outline-none cursor-pointer"
-              >
-                <option value="male">ذكر</option>
-                <option value="female">أنثى</option>
-              </select>
-              </div>
-            </div>
+            <CustomSelect
+              label="الجنس"
+              value={gender}
+              onChange={setGender}
+              placeholder="اختر الجنس"
+              options={[
+                { value: "male", label: "ذكر" },
+                { value: "female", label: "أنثى" },
+              ]}
+            />
+
           </div>
+
 
           {renderInput("اسم المستخدم", <FiUser />, "text", username, (e) => setUsername(e.target.value))}
           {renderInput("الاسم بالعربية ثلاثي", <FiUser />, "text", arabic_name, (e) => setArabic_name(e.target.value))}
@@ -204,26 +197,17 @@ function Register() {
             {renderPhone(fatherPhone, setFatherPhone, "fatherPhone", "رقم ولي الأمر")}
 
               {/* المرحلة */}
-              <div>
-                <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
-                  المرحلة الدراسية
-                </label>
-                <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md p-3 shadow-inner">
-                  <span className="text-xl text-violet-600 dark:text-violet-400"><FiUsers /></span>
-                  <select
-                    value={stage}
-                    onChange={(e) => setStage(e.target.value)}
-                    className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none cursor-pointer"
-                  >
-                    <option value="1st_prep">أولى إعدادي</option>
-                    <option value="2nd_prep">ثانية إعدادي</option>
-                    <option value="3rd_prep">ثالثة إعدادي</option>
-                    <option value="1st_sec">أولى ثانوي</option>
-                    <option value="2nd_sec">ثانية ثانوي</option>
-                    <option value="3rd_sec">ثالثة ثانوي</option>
-                  </select>
-                </div>
-              </div>
+              <CustomSelect
+                icon={<FiBook />}
+                label="المرحلة الدراسية"
+                value={stage}
+                onChange={setStage}
+                options={[
+                  { value: "1st_sec", label: "أولى ثانوي" },
+                  { value: "2nd_sec", label: "ثانية ثانوي" },
+                  { value: "3rd_sec", label: "ثالثة ثانوي" },
+                ]}
+              />
             </>
           )}
 

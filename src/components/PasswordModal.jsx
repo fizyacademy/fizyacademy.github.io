@@ -73,7 +73,7 @@ const [showPassword, setShowPassword] = useState(false);
         كلمة المرور
       </label>
 
-      <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 border border-gray-300 dark:border-gray-600 rounded-md p-3">
+      <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 border border-gray-300 dark:border-gray-600 rounded-md px-3">
         <span className="text-xl text-violet-600 dark:text-violet-400">
           <FiLock />
         </span>
@@ -83,7 +83,7 @@ const [showPassword, setShowPassword] = useState(false);
           placeholder={placeholder}
           value={form[name]}
           onChange={handleChange}
-          className="w-full bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none disabled:text-gray-400"
+          className="w-full bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none disabled:text-gray-400 py-3"
           required
           />
           <button

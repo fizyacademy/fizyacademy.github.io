@@ -14,7 +14,6 @@ def is_valid_arabic_name(name):
 
 # ✅ المراحل المسموح بها
 VALID_STAGES = {
-    "1st_prep", "2nd_prep", "3rd_prep",
     "1st_sec", "2nd_sec", "3rd_sec"
 }
 
@@ -33,7 +32,6 @@ def update_profile():
             return jsonify({"message": "أفاتار غير صالح"}), 400
         user.avatar = data["avatar"]
 
-
     # ✅ تعديل الاسم العربي متاح للجميع
     if "arabic_name" in data:
         if not is_valid_arabic_name(data["arabic_name"]):
@@ -42,6 +40,14 @@ def update_profile():
 
     # 👨‍🎓 الطالب فقط يقدر يغيّر الباقي
     if role == "student":
+        # ✅ تحقق أن رقم الطالب لا يساوي رقم ولي الأمر
+        if (
+            "student_phone" in data
+            and "father_phone" in data
+            and data["student_phone"] == data["father_phone"]
+        ):
+            return jsonify({"message": "رقم الطالب لا يجب أن يطابق رقم ولي الأمر"}), 400
+
         if "email" in data and data["email"] != user.email:
             if User.query.filter_by(email=data["email"]).first():
                 return jsonify({"message": "البريد الإلكتروني مستخدم بالفعل"}), 400
