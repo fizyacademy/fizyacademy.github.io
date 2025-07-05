@@ -1,5 +1,3 @@
-// AccountSettings.jsx
-
 import { useEffect, useState } from "react";
 import {
   FiUser,
@@ -18,8 +16,7 @@ import AvatarModal from "../components/AvatarModal";
 import Loading from "../components/Loading";
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
-
-const BASE_URL = "http://localhost:5000";
+import { fetchWithAuth } from "../utils";
 
 const stageOptions = [
   { value: "1st_sec", label: "الصف الأول الثانوي" },
@@ -49,11 +46,7 @@ const AccountSettings = () => {
   const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/auth/me`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((res) => res.json())
+    fetchWithAuth("/auth/me")
       .then((data) => {
         setUser(data.user);
         setFormData({
@@ -84,19 +77,17 @@ const AccountSettings = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     setMessage("");
-    const res = await fetch(`${BASE_URL}/account/update`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(formData),
-    });
 
-    const data = await res.json();
-    if (res.ok) {
-      setMessage("✅ تم الحفظ بنجاح");
+    try {
+      const data = await fetchWithAuth("/account/update", {
+        method: "PUT",
+        body: JSON.stringify(formData),
+      });
+
+      setMessage(data.message || "✅ تم الحفظ بنجاح");
       setEditFields({});
-    } else {
-      setMessage("❌ " + data.message);
+    } catch (err) {
+      setMessage("❌ " + err.message);
     }
   };
 
@@ -163,7 +154,7 @@ const AccountSettings = () => {
               type="button"
               onClick={() => toggleEdit(field)}
               className="text-sm text-blue-600 underline cursor-pointer pl-[5px]"
-              >
+            >
               {editFields[field] ? <IoClose /> : <FiEdit />}
             </button>
           </>
@@ -172,31 +163,29 @@ const AccountSettings = () => {
     </div>
   );
 
-const renderStage = () => (
-  <div>
-    <label className="block mb-1 text-gray-800 dark:text-white">المرحلة الدراسية</label>
-    <CustomSelect
-      value={formData.stage}
-      onChange={(val) => setFormData({ ...formData, stage: val })}
-      options={stageOptions}
-      icon={<FiBook />}
-      isDisabled={!editFields.stage}
-      editButton={
-        isEditable("stage") && (
-          <button
-            type="button"
-            onClick={() => toggleEdit("stage")}
-            className="text-sm text-blue-600 underline cursor-pointer"
-          >
-            {editFields["stage"] ? <IoClose /> : <FiEdit />}
-          </button>
-        )
-      }
-    />
-  </div>
-);
-
-
+  const renderStage = () => (
+    <div>
+      <label className="block mb-1 text-gray-800 dark:text-white">المرحلة الدراسية</label>
+      <CustomSelect
+        value={formData.stage}
+        onChange={(val) => setFormData({ ...formData, stage: val })}
+        options={stageOptions}
+        icon={<FiBook />}
+        isDisabled={!editFields.stage}
+        editButton={
+          isEditable("stage") && (
+            <button
+              type="button"
+              onClick={() => toggleEdit("stage")}
+              className="text-sm text-blue-600 underline cursor-pointer"
+            >
+              {editFields["stage"] ? <IoClose /> : <FiEdit />}
+            </button>
+          )
+        }
+      />
+    </div>
+  );
 
   if (!user) return <Loading />;
 

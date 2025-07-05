@@ -188,25 +188,35 @@ const login = async (username, password) => {
     }
 };
 
-// ✅ دالة fetch مع التوكن والكوكي
+// ✅ استخرج CSRF Token من الكوكي
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  return match ? match[2] : null;
+}
+
+// ✅ دالة fetch مع تضمين CSRF Token في POST و PUT
 const fetchWithAuth = async (url, options = {}) => {
-    const hasBody = options.body !== undefined;
+  const method = (options.method || "GET").toUpperCase();
+  const csrfToken = getCookie("csrf_access_token");
 
-    const finalOptions = {
-        ...options,
-        credentials: "include",
-        headers: {
-            ...(hasBody ? { "Content-Type": "application/json" } : {}),
-            ...(options.headers || {}),
-        },
-    };
+  const finalOptions = {
+    ...options,
+    credentials: "include",
+    headers: {
+      ...(method !== "GET" ? { "Content-Type": "application/json" } : {}),
+      ...(options.headers || {}),
+      ...(method !== "GET" && csrfToken
+        ? { "X-CSRF-TOKEN": csrfToken }
+        : {}),
+    },
+  };
 
-    const response = await fetch(`${API_BASE_URL}${url}`, finalOptions);
-    const data = await response.json();
+  const response = await fetch(`${API_BASE_URL}${url}`, finalOptions);
+  const data = await response.json();
 
-    if (!response.ok) throw new Error(data.message || "Request failed");
+  if (!response.ok) throw new Error(data.message || "Request failed");
 
-    return data;
+  return data;
 };
 
 // ✅ دوال get للبيانات

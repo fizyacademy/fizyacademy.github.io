@@ -79,21 +79,27 @@ def update_profile():
 @account_bp.route("/change-password", methods=["PUT"])
 @jwt_required()
 def change_password():
-    user = User.query.get(get_jwt_identity())
     data = request.get_json()
 
-    if not check_password_hash(user.password, data.get("current_password", "")):
-        return jsonify({"message": "كلمة المرور الحالية غير صحيحة"}), 400
+    user = User.query.get(get_jwt_identity())
+    if not user:
+        return jsonify({"message": "المستخدم غير موجود"}), 404
 
-    new_password = data.get("new_password")
-    confirm_password = data.get("confirm_password")
+    current_password = data.get("current_password", "")
+    new_password = data.get("new_password", "")
+    confirm_password = data.get("confirm_password", "")
 
-    if not new_password or len(new_password) < 6:
-        return jsonify({"message": "كلمة المرور الجديدة ضعيفة"}), 400
+    if not check_password_hash(user.password, current_password):
+        return jsonify({"message": "❌ كلمة المرور الحالية غير صحيحة"}), 400
+
+    if len(new_password) < 6:
+        return jsonify({"message": "❌ كلمة المرور الجديدة ضعيفة"}), 400
 
     if new_password != confirm_password:
-        return jsonify({"message": "كلمتا المرور غير متطابقتين"}), 400
+        return jsonify({"message": "❌ كلمتا المرور غير متطابقتين"}), 400
 
+    # تحديث كلمة المرور
     user.password = generate_password_hash(new_password)
     db.session.commit()
-    return jsonify({"message": "تم تغيير كلمة المرور بنجاح"}), 200
+
+    return jsonify({"message": "✅ تم تغيير كلمة المرور بنجاح"}), 200

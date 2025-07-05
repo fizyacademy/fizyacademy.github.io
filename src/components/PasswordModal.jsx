@@ -1,9 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { FiLock, FiCheck, FiX, FiEye, FiEyeOff } from "react-icons/fi";
-
-
-const BASE_URL = "http://localhost:5000";
+import { fetchWithAuth } from "../utils"; // ✅ استدعاء الدالة
 
 const PasswordModal = ({ onClose }) => {
   const [form, setForm] = useState({
@@ -13,6 +11,7 @@ const PasswordModal = ({ onClose }) => {
   });
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -40,23 +39,17 @@ const PasswordModal = ({ onClose }) => {
     setLoading(true);
 
     try {
-      const res = await fetch(`${BASE_URL}/account/change-password`, {
+      const data = await fetchWithAuth("/account/change-password", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();
       setMsg(data.message);
-
-      if (res.ok) {
-        setForm({
-          current_password: "",
-          new_password: "",
-          confirm_password: "",
-        });
-      }
+      setForm({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
     } catch (err) {
       console.error("خطأ:", err);
       setMsg("❌ حدث خطأ أثناء تغيير كلمة المرور");
@@ -64,8 +57,6 @@ const PasswordModal = ({ onClose }) => {
       setLoading(false);
     }
   };
-
-const [showPassword, setShowPassword] = useState(false);
 
   const renderInput = (name, placeholder) => (
     <div>
@@ -85,14 +76,14 @@ const [showPassword, setShowPassword] = useState(false);
           onChange={handleChange}
           className="w-full bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none disabled:text-gray-400 py-3"
           required
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="text-violet-600 dark:text-violet-400 focus:outline-none cursor-pointer"
-          >
-            {showPassword ? <FiEyeOff /> : <FiEye />}
-          </button>
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword((prev) => !prev)}
+          className="text-violet-600 dark:text-violet-400 focus:outline-none cursor-pointer"
+        >
+          {showPassword ? <FiEyeOff /> : <FiEye />}
+        </button>
       </div>
     </div>
   );
@@ -110,7 +101,9 @@ const [showPassword, setShowPassword] = useState(false);
           {renderInput("confirm_password", "تأكيد كلمة المرور")}
 
           {msg && (
-            <p className="text-sm text-center mt-2 text-red-600 dark:text-red-400">{msg}</p>
+            <p className="text-sm text-center mt-2 text-red-600 dark:text-red-400">
+              {msg}
+            </p>
           )}
 
           <div className="flex justify-between items-center mt-4">
