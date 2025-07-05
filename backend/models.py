@@ -1,9 +1,6 @@
-# models.py
-
 from datetime import datetime
 from db import db
 import uuid
-from slugify import slugify
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -27,7 +24,6 @@ class User(db.Model):
     gender = db.Column(db.String(10))
     avatar = db.Column(db.String(50))
 
-
     def to_dict(self):
         return {
             "userID": self.id,
@@ -47,3 +43,9 @@ class User(db.Model):
             "avatar": self.avatar,
             "created_at": self.created_at.isoformat()
         }
+
+# ✅ جدول لتخزين التوكنات الملغاة (revoked)
+class TokenBlocklist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

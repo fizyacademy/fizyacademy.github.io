@@ -1,21 +1,23 @@
-# auth.py
-
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (
     create_access_token,
+    create_refresh_token,
     get_jwt_identity,
     jwt_required,
     set_access_cookies,
+    set_refresh_cookies,
     unset_jwt_cookies,
+    get_jwt
 )
-from models import User
+from models import User, TokenBlocklist
 from db import db
 import random
+from datetime import datetime
 
 auth_bp = Blueprint("auth", __name__)
 
-# ✅ توليد كوبون فريد: أول 5 حروف من username + 4 أرقام
+# ✅ توليد كوبون فريد
 def generate_coupon_code(username):
     base = username[:5].lower()
     while True:
@@ -24,7 +26,7 @@ def generate_coupon_code(username):
         if not User.query.filter_by(coupon_code=coupon).first():
             return coupon
 
-# ✅ توليد كود مستخدم فريد للبحث (8 أرقام مع #)
+# ✅ توليد كود مستخدم فريد
 def generate_unique_user_code():
     while True:
         code = "#" + str(random.randint(10000000, 99999999))
@@ -36,7 +38,6 @@ def generate_unique_user_code():
 def register():
     data = request.get_json()
 
-    # التحقق من التكرار
     if User.query.filter_by(username=data["username"]).first():
         return jsonify({"message": "اسم المستخدم موجود بالفعل"}), 400
 
@@ -45,28 +46,21 @@ def register():
 
     if data.get("student_phone") and User.query.filter_by(student_phone=data["student_phone"]).first():
         return jsonify({"message": "رقم الطالب مستخدم بالفعل"}), 400
-    
-    # تحقق إن رقم ولي الأمر مختلف عن رقم الطالب
-    if data.get("student_phone") and data.get("father_phone"):
-        if data["student_phone"] == data["father_phone"]:
-            return jsonify({"message": "رقم الطالب لا يجب أن يطابق رقم ولي الأمر"}), 400
 
+    if data.get("student_phone") == data.get("father_phone"):
+        return jsonify({"message": "رقم الطالب لا يجب أن يطابق رقم ولي الأمر"}), 400
 
-    # تحقق من الطول الأدنى لكلمة المرور
     if len(data["password"]) < 6:
         return jsonify({"message": "كلمة المرور يجب أن تكون على الأقل 6 أحرف"}), 400
-    
 
-    # التشفير وتوليد الأكواد
     hashed_password = generate_password_hash(data["password"])
     coupon = generate_coupon_code(data["username"])
     user_code = generate_unique_user_code()
     referred_by = data.get("referred_by")
 
-    gender = data.get("gender")
+    gender = data.get("gender", "male")
     default_avatar = "boy_1" if gender == "male" else "girl_1"
 
-    # إنشاء المستخدم
     new_user = User(
         username=data["username"],
         arabic_name=data.get("arabic_name", ""),
@@ -80,24 +74,22 @@ def register():
         user_code=user_code,
         referred_by=referred_by,
         points=0,
-        gender=data.get(gender, 'male'),
+        gender=gender,
         avatar=default_avatar,
         is_approved=True if data.get("role", "student") == "student" or data["username"] == "admin" else False
     )
 
     db.session.add(new_user)
 
-    # ✅ تحديث نقاط المحيل إن وجد
     if referred_by:
         referrer = User.query.filter_by(coupon_code=referred_by).first()
         if referrer:
             referrer.points += 1
 
     db.session.commit()
-
     return jsonify({"message": "تم التسجيل بنجاح"}), 201
 
-# ✅ تسجيل الدخول
+# ✅ تسجيل الدخول: Access + Refresh + Cookies
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -110,11 +102,38 @@ def login():
         return jsonify({"message": "لم يتم الموافقة على الحساب بعد"}), 403
 
     access_token = create_access_token(identity=user.id)
+    refresh_token = create_refresh_token(identity=user.id)
+
     response = jsonify({
         "message": "تم تسجيل الدخول بنجاح",
         "user": user.to_dict()
     })
+
     set_access_cookies(response, access_token)
+    set_refresh_cookies(response, refresh_token)
+    return response, 200
+
+# ✅ تجديد التوكن باستخدام Refresh Token
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh_token():
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+
+    response = jsonify({"message": "تم تجديد التوكن بنجاح"})
+    set_access_cookies(response, access_token)
+    return response
+
+# ✅ تسجيل الخروج مع إلغاء التوكنات
+@auth_bp.route("/logout", methods=["POST"])
+@jwt_required(verify_type=False)
+def logout():
+    jti = get_jwt()["jti"]
+    db.session.add(TokenBlocklist(jti=jti, created_at=datetime.utcnow()))
+    db.session.commit()
+
+    response = jsonify({"message": "تم تسجيل الخروج بنجاح"})
+    unset_jwt_cookies(response)
     return response, 200
 
 # ✅ جلب المستخدم الحالي
@@ -125,11 +144,3 @@ def get_current_user():
     if not user:
         return jsonify({"message": "المستخدم غير موجود"}), 404
     return jsonify({"user": user.to_dict()})
-
-# ✅ تسجيل الخروج
-@auth_bp.route("/logout", methods=["POST"])
-@jwt_required()
-def logout():
-    response = jsonify({"message": "تم تسجيل الخروج بنجاح"})
-    unset_jwt_cookies(response)
-    return response, 200
