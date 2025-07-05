@@ -1,3 +1,5 @@
+// App.jsx
+
 import './App.css';
 import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -5,8 +7,6 @@ import Loading from "./components/Loading";
 import { getRole, isAuthenticated } from "./utils";
 import AccountSettings from "./Pages/AccountSettings";
 import UIReferencePage from './Pages/UiReferencePage';
-
-
 
 const Student = lazy(() => import("./Pages/Student"));
 const Admin = lazy(() => import("./Pages/Admin"));
@@ -31,15 +31,9 @@ function App() {
             setLoading(false);
         };
 
-        // 🔁 التحديث مرة واحدة عند التحميل
         updateUserRole();
-
-        // 🔁 تحديث عند أي تغيير في التخزين المحلي (حتى من نفس الصفحة)
         const storageListener = () => updateUserRole();
-
         window.addEventListener("storage", storageListener);
-
-        // 🔁 التحديث أيضًا من نفس الصفحة عبر interval بسيط
         const intervalId = setInterval(updateUserRole, 1000);
 
         return () => {
@@ -64,7 +58,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/account" element={<AccountSettings />} />
-                    <Route path='/ui-reference' element={<UIReferencePage/>} />
+                    <Route path="/ui-reference" element={<UIReferencePage />} />
                     <Route path="/*" element={RoleComponent} />
                 </Routes>
             </Suspense>

@@ -49,8 +49,9 @@ def register():
     if data.get("student_phone") and User.query.filter_by(student_phone=data["student_phone"]).first():
         return jsonify({"message": "رقم الطالب مستخدم بالفعل"}), 400
 
-    if data.get("student_phone") == data.get("father_phone"):
-        return jsonify({"message": "رقم الطالب لا يجب أن يطابق رقم ولي الأمر"}), 400
+    if data.get("father_phone") and data.get("student_phone"):
+        if data.get("student_phone") == data.get("father_phone"):
+            return jsonify({"message": "رقم الطالب لا يجب أن يطابق رقم ولي الأمر"}), 400
 
     if len(data["password"]) < 6:
         return jsonify({"message": "كلمة المرور يجب أن تكون على الأقل 6 أحرف"}), 400

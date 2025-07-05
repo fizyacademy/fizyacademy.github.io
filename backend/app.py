@@ -1,3 +1,5 @@
+# app.py
+
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, get_jwt
@@ -9,13 +11,14 @@ from models import User, TokenBlocklist
 from account import account_bp
 from werkzeug.security import generate_password_hash
 import os
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
     # ✅ تفعيل CORS للسماح بالكوكيز في بيئة التطوير
-    CORS(app, supports_credentials=True)
+    CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 
     # ✅ تهيئة قواعد البيانات و JWT
     db.init_app(app)
@@ -43,6 +46,7 @@ def create_app():
                 password=generate_password_hash(os.getenv("ADMIN_PASSWORD")),
                 role="admin",
                 gender="male",
+                avatar="boy_1",
                 user_code="#00000001",
                 is_approved=True
             )

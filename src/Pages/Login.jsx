@@ -1,34 +1,31 @@
+// Login.jsx
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiUser, FiLock, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
-import { setUserData, fetchWithAuth } from "../utils";
+import { login } from "../utils";
 
 function Login() {
   const [username, setUser] = useState("");
   const [password, setPass] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
-    try {
-      const data = await fetchWithAuth("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ username, password }),
-        headers: { "Content-Type": "application/json" },
-      });
+    const result = await login(username, password);
 
-      if (!data.user)
-        throw new Error("المستخدم غير موجود أو البيانات غير مكتملة");
-
-      setUserData(data.user);
-      alert("تم تسجيل الدخول بنجاح");
-      window.location.pathname = "/";
-    } catch (err) {
-      setError(err.message);
+    if (!result.success) {
+      setError(result.message);
+      return;
     }
+
+    alert("✅ تم تسجيل الدخول بنجاح");
+    navigate("/");
   };
 
   return (

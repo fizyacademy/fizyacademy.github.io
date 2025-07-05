@@ -1,3 +1,5 @@
+// utils.jsx
+
 const mainPath = "http://localhost:5173/";
 
 const subscription = () => {
@@ -171,6 +173,7 @@ const login = async (username, password) => {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ username, password }),
         });
 
@@ -187,11 +190,13 @@ const login = async (username, password) => {
 
 // ✅ دالة fetch مع التوكن والكوكي
 const fetchWithAuth = async (url, options = {}) => {
+    const hasBody = options.body !== undefined;
+
     const finalOptions = {
         ...options,
         credentials: "include",
         headers: {
-            "Content-Type": "application/json",
+            ...(hasBody ? { "Content-Type": "application/json" } : {}),
             ...(options.headers || {}),
         },
     };
