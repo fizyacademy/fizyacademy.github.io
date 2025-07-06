@@ -71,7 +71,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
           <AccountInfo isCollapsed={isCollapsed} role={userRole} />
         </Link>
 
-        <div className="flex flex-col gap-1 px-2">
+        <div className="flex flex-col-reverse gap-1 px-2">
           {/* روابط الديناميكية حسب الدور */}
           {extraLinks.map(({ icon, text, link }, idx) => (
             <SideBtn
