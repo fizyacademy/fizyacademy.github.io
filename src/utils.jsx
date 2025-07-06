@@ -39,7 +39,6 @@ const setUserData = (userData) => {
 const initUserData = async () => {
   try {
     const data = await fetchWithAuth("/auth/me");
-    console.log("🔍 fetched user data:", data);
     setUserData(data.user); // أو data حسب النتيجة
   } catch (err) {
     console.error("❌ Failed to fetch user data:", err.message);
