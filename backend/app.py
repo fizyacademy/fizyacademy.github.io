@@ -3,7 +3,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, get_jwt
-from config import Config
+from config import Config, instance_dir
 from db import db
 from auth import auth_bp
 from admin import admin_bp
@@ -11,7 +11,6 @@ from models import User, TokenBlocklist
 from account import account_bp
 from werkzeug.security import generate_password_hash
 import os
-from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
@@ -34,6 +33,9 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(account_bp, url_prefix="/account")
+
+    # ✅ إنشاء مجلد قاعدة البيانات إن لم يكن موجود
+    os.makedirs(instance_dir, exist_ok=True)
 
     # ✅ إنشاء قاعدة البيانات + إضافة مسؤول افتراضي
     with app.app_context():
