@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiUser, FiLock, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
-import { login } from "../utils";
+import { login, initUserData } from "../utils";
 
 function Login() {
   const [username, setUser] = useState("");
@@ -23,6 +23,8 @@ function Login() {
       setError(result.message);
       return;
     }
+
+    await initUserData(); // ✅ تأكد من تحميل بيانات المستخدم
 
     alert("✅ تم تسجيل الدخول بنجاح");
     navigate("/");

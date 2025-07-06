@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { navLinks } from "../constants/navLinks";
-import { role } from "../utils";
+import { fetchWithAuth } from "../utils";
 
 const iconMap = {
   home: "mdi:home",
@@ -17,46 +17,65 @@ const iconMap = {
   account_circle: "mdi:account-circle",
 };
 
-const baseLinks = [
-  ...(navLinks[role] || []),
-  { icon: "home", text: "الرئيسية", link: "/" },
-  { icon: "settings", text: "الإعدادات", link: "/settings" },
-  { icon: "account_circle", text: "الحساب", link: "/account" },
-];
-
 const VISIBLE_COUNT = 5;
-const TOTAL_LINKS = baseLinks.length;
 
 const MobileBottomNav = () => {
   const location = useLocation();
+  const [baseLinks, setBaseLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [startIndex, setStartIndex] = useState(0);
   const [longPressedIdx, setLongPressedIdx] = useState(null);
   const centerIndex = Math.floor(VISIBLE_COUNT / 2);
   let longPressTimeout = null;
 
   useEffect(() => {
+    fetchWithAuth("/auth/me")
+      .then((data) => {
+        const role = (data.user?.role) || "guest";
+        const links = [
+          ...(navLinks[role] || []),
+          { icon: "home", text: "الرئيسية", link: "/" },
+          { icon: "settings", text: "الإعدادات", link: "/settings" },
+          { icon: "account_circle", text: "الحساب", link: "/account" },
+        ];
+        setBaseLinks(links);
+      })
+      .catch(() => {
+        setBaseLinks([
+          { icon: "home", text: "الرئيسية", link: "/" },
+          { icon: "settings", text: "الإعدادات", link: "/settings" },
+          { icon: "account_circle", text: "الحساب", link: "/account" },
+        ]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (baseLinks.length === 0) return;
+
     const activeIdx = baseLinks.findIndex((l) => l.link === location.pathname);
     if (activeIdx !== -1) {
-      let newStart = (activeIdx - centerIndex + TOTAL_LINKS) % TOTAL_LINKS;
+      let newStart = (activeIdx - centerIndex + baseLinks.length) % baseLinks.length;
       setStartIndex(newStart);
     }
-  }, [location.pathname]);
+  }, [location.pathname, baseLinks]);
 
   const getVisibleLinks = () => {
+    if (baseLinks.length === 0) return [];
     const links = [];
     for (let i = 0; i < VISIBLE_COUNT; i++) {
-      const index = (startIndex + i + TOTAL_LINKS) % TOTAL_LINKS;
+      const index = (startIndex + i + baseLinks.length) % baseLinks.length;
       links.push(baseLinks[index]);
     }
-    return links;
+    return links.filter(Boolean);
   };
 
   const handleLeft = () => {
-    setStartIndex((prev) => (prev - 1 + TOTAL_LINKS) % TOTAL_LINKS);
+    setStartIndex((prev) => (prev - 1 + baseLinks.length) % baseLinks.length);
   };
 
   const handleRight = () => {
-    setStartIndex((prev) => (prev + 1) % TOTAL_LINKS);
+    setStartIndex((prev) => (prev + 1) % baseLinks.length);
   };
 
   const handleIconPointerDown = (idx) => {
@@ -75,12 +94,13 @@ const MobileBottomNav = () => {
     setLongPressedIdx(null);
   };
 
+  if (loading || baseLinks.length === 0) return null;
+
   const visibleLinks = getVisibleLinks();
 
   return (
     <nav className="fixed bottom-0 w-full z-50 md:hidden">
       <div className="relative h-[80px] bg-white/80 dark:bg-gray-900 backdrop-blur-xl border-t border-gray-300 dark:border-gray-700 shadow-xl overflow-visible">
-         {/* الانحناءة */}
         <svg
           className="absolute top-0 left-0 w-full h-full pointer-events-none"
           viewBox="0 0 100 100"
@@ -93,9 +113,7 @@ const MobileBottomNav = () => {
           />
         </svg>
 
-        {/* محتوى الشريط */}
         <div className="relative flex items-center justify-between px-3 h-full z-10">
-          {/* زر يسار */}
           <button
             onClick={handleLeft}
             className="p-2 rounded-full bg-violet-500/70 dark:bg-black/40 hover:scale-105 transition cursor-pointer z-20"
@@ -103,7 +121,6 @@ const MobileBottomNav = () => {
             <Icon icon="mdi:chevron-left" className="text-2xl rotate-180" />
           </button>
 
-          {/* اللينكات */}
           <div
             className="flex-1 flex justify-center items-end gap-6 overflow-visible relative"
             style={{ perspective: "3000px" }}
@@ -113,6 +130,8 @@ const MobileBottomNav = () => {
               style={{ transformStyle: "preserve-3d" }}
             >
               {visibleLinks.map(({ icon, link, text }, index) => {
+                if (!icon || !link) return null;
+
                 const isActive = location.pathname === link;
                 const offset = index - centerIndex;
                 const isCenter = offset === 0;
@@ -125,16 +144,13 @@ const MobileBottomNav = () => {
 
                 let iconClasses = "";
                 if (isActive && isCenter) {
-                  iconClasses =
-                    "bg-violet-600 text-white dark:bg-violet-500 dark:text-white";
+                  iconClasses = "bg-violet-600 text-white dark:bg-violet-500 dark:text-white";
                 } else if (isActive && !isCenter) {
                   iconClasses = "text-violet-700 dark:text-violet-400";
                 } else if (isCenter) {
-                  iconClasses =
-                    "bg-violet-500 text-white dark:bg-violet-500/60 dark:text-white";
+                  iconClasses = "bg-violet-500 text-white dark:bg-violet-500/60 dark:text-white";
                 } else {
-                  iconClasses =
-                    "bg-white/60 text-gray-700 dark:bg-gray-700/40 dark:text-gray-100";
+                  iconClasses = "bg-white/60 text-gray-700 dark:bg-gray-700/40 dark:text-gray-100";
                 }
 
                 return (
@@ -176,7 +192,6 @@ const MobileBottomNav = () => {
             </div>
           </div>
 
-          {/* زر يمين */}
           <button
             onClick={handleRight}
             className="p-2 rounded-full bg-violet-500/70 dark:bg-black/40 hover:scale-105 transition cursor-pointer z-20"

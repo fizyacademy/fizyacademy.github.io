@@ -1,40 +1,41 @@
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Post from "../components/Post";
 import QuizBtn from "../components/QuizBtn";
-import { subscription, averageMark, getStage } from "../utils";
 import AccountInfo from "../components/AccountInfo";
 import MobileBottomNav from "../components/MobileBottomNav";
+import { fetchWithAuth } from "../utils";
 
 function Student() {
-  const stage = getStage();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    fetchWithAuth("/auth/me")
+      .then(res => res.json())
+      .then(setUserData)
+      .catch(console.error);
+  }, []);
 
   return (
     <div className="w-full min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white">
       <Navbar />
-
       <div className="flex pt-[8vh]">
         <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-
-        <main
-          className={`flex-1 transition-all duration-500 p-4 md:p-6 lg:p-8 space-y-6 pb-24 md:pb-6 ${
-            isCollapsed ? "md:mr-[60px]" : "md:mr-[250px]"
-          }`}
-        >
+        <main className={`flex-1 transition-all duration-500 p-4 md:p-6 lg:p-8 space-y-6 pb-24 md:pb-6 ${isCollapsed ? "md:mr-[60px]" : "md:mr-[250px]"}`}>
           <WidgetCont>
             <Post title="الحساب (طالب)" className="col-span-2 row-span-2" container showToggle>
               <AccountInfo />
             </Post>
-            <Post title="الصف الدراسي" body={stage} className="col-span-2 row-span-1" />
-            <Post title="نوع الاشتراك" body={subscription()} className="col-span-1 row-span-1" showToggle />
+            <Post title="الصف الدراسي" body={userData?.stage || "جاري التحميل..."} className="col-span-2 row-span-1" />
+            <Post title="نوع الاشتراك" body={userData?.subscription || "جاري التحميل..."} className="col-span-1 row-span-1" showToggle />
             <Post
               title="التقييم الاجمالي"
               body={
                 <span className="flex gap-3 items-center">
-                  <div className="rounded-full w-4 h-4 bg-green-700"></div> {averageMark}
+                  <div className="rounded-full w-4 h-4 bg-green-700"></div> {userData?.average_mark ?? "—"}
                 </span>
               }
               className="col-span-1 row-span-1"
@@ -66,7 +67,6 @@ function Student() {
           </WidgetCont>
         </main>
       </div>
-
       <MobileBottomNav />
     </div>
   );

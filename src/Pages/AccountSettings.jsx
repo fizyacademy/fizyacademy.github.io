@@ -1,5 +1,3 @@
-// AccountSettings.jsx
-
 import { useEffect, useState } from "react";
 import {
   FiUser,
@@ -50,14 +48,15 @@ const AccountSettings = () => {
   useEffect(() => {
     fetchWithAuth("/auth/me")
       .then((data) => {
-        setUser(data.user);
+        const userData = data.user || data; // التحقق إذا كان فيه user أو لا
+        setUser(userData);
         setFormData({
-          arabic_name: data.user.arabic_name || "",
-          student_phone: data.user.student_phone || "",
-          father_phone: data.user.father_phone || "",
-          stage: data.user.stage || "",
-          email: data.user.email || "",
-          avatar: data.user.avatar || "boy_1",
+          arabic_name: userData.arabic_name || "",
+          student_phone: userData.student_phone || "",
+          father_phone: userData.father_phone || "",
+          stage: userData.stage || "",
+          email: userData.email || "",
+          avatar: userData.avatar || "boy_1",
         });
       })
       .catch(() => setMessage("❌ فشل تحميل البيانات"));
@@ -80,11 +79,24 @@ const AccountSettings = () => {
     e.preventDefault();
     setMessage("");
 
+    const isAvatarChanged = formData.avatar !== user.avatar;
+    const hasChanges = isAvatarChanged || Object.keys(editFields).some((key) => editFields[key]);
+
+    if (!hasChanges) {
+      setMessage("⚠️ لا توجد تغييرات لحفظها");
+      return;
+    }
+
+
     try {
       const data = await fetchWithAuth("/account/update", {
         method: "PUT",
         body: JSON.stringify(formData),
       });
+
+      if (data.user) {
+        setUser(data.user);
+      }
 
       setMessage(data.message || "✅ تم الحفظ بنجاح");
       setEditFields({});
@@ -195,16 +207,13 @@ const AccountSettings = () => {
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex justify-center items-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-5xl p-8 flex flex-col md:flex-row gap-10">
         <div className="flex flex-col items-center">
-          <div
-            className="relative group cursor-pointer"
-            onClick={() => setShowAvatarModal(true)}
-          >
+          <div className="relative group cursor-pointer" onClick={() => setShowAvatarModal(true)}>
             <img
               src={avatarImages[formData.avatar]}
               alt="avatar"
               className="w-32 h-32 rounded-full border-4 border-violet-600"
             />
-            <div className="absolute inset-0 rounded-full bg-black/70 bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+            <div className="absolute inset-0 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
               <span className="text-white">تغيير</span>
             </div>
           </div>
@@ -212,9 +221,7 @@ const AccountSettings = () => {
 
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">
-              إعدادات الحساب
-            </h2>
+            <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">إعدادات الحساب</h2>
             <ThemeToggle />
           </div>
 
@@ -251,9 +258,7 @@ const AccountSettings = () => {
         </div>
       </div>
 
-      {showPasswordModal && (
-        <PasswordModal onClose={() => setShowPasswordModal(false)} />
-      )}
+      {showPasswordModal && <PasswordModal onClose={() => setShowPasswordModal(false)} />}
       {showAvatarModal && (
         <AvatarModal
           currentAvatar={formData.avatar}

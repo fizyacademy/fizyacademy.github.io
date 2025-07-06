@@ -1,200 +1,117 @@
 // utils.jsx
-
 const mainPath = "http://localhost:5173/";
-
-const subscription = () => {
-    return "Premium";
-};
-
-const averageMark = 95;
-
 const API_BASE_URL = "http://localhost:5000";
 
-// استرداد القيم المخزنة من localStorage
-let username = localStorage.getItem("username") || "";
-let arabic_name = localStorage.getItem("arabic_name") || "";
-let role = localStorage.getItem("role") || "";
-let stage = localStorage.getItem("stage") || "student";
-let userID = localStorage.getItem("userID") || "";
-let coupon = localStorage.getItem("coupon") || "";
-let studentPhone = localStorage.getItem("student_phone") || "";
-let fatherPhone = localStorage.getItem("father_phone") || "";
-let userCode = localStorage.getItem("user_code") || "";
-let points = parseInt(localStorage.getItem("points")) || 0;
-let referredBy = localStorage.getItem("referred_by") || "";
+const subscription = () => "Premium";
+const averageMark = 95;
 
-// ✅ setters منفصلة
-const setUsername = (newUsername) => {
-    localStorage.setItem("username", newUsername);
-    username = newUsername;
-};
+// 🧠 المتغيرات الداخلية
+let username = "";
+let arabic_name = "";
+let role = "";
+let stage = "student";
+let userID = "";
+let coupon = "";
+let studentPhone = "";
+let fatherPhone = "";
+let userCode = "";
+let points = 0;
+let referredBy = "";
 
-const setRole = (newRole) => {
-    localStorage.setItem("role", newRole);
-    role = newRole;
-};
-
-const setStage = (newStage) => {
-    localStorage.setItem("stage", newStage);
-    stage = newStage;
-};
-
-const setUserID = (newUserID) => {
-    localStorage.setItem("userID", newUserID);
-    userID = newUserID;
-};
-
-const setStudentPhone = (newStudentPhone) => {
-    localStorage.setItem("student_phone", newStudentPhone);
-    studentPhone = newStudentPhone;
-};
-
-const setFatherPhone = (newFatherPhone) => {
-    localStorage.setItem("father_phone", newFatherPhone);
-    fatherPhone = newFatherPhone;
-};
-
-const setUserCode = (newCode) => {
-    localStorage.setItem("user_code", newCode);
-    userCode = newCode;
-};
-
-const setPoints = (newPoints) => {
-    localStorage.setItem("points", newPoints.toString());
-    points = parseInt(newPoints);
-};
-
-const setReferredBy = (code) => {
-    localStorage.setItem("referred_by", code);
-    referredBy = code;
-};
-
-// ✅ setUserData الشاملة
+// ✅ تحديث المتغيرات بناء على بيانات السيرفر
 const setUserData = (userData) => {
-    if (!userData || typeof userData !== "object") return;
+  if (!userData || typeof userData !== "object") return;
 
-    const {
-        username = "",
-        arabic_name = "",
-        role = "guest",
-        stage = "",
-        userID = "",
-        coupon_code = "",
-        student_phone = "",
-        father_phone = "",
-        user_code = "",
-        points = 0,
-        referred_by = "",
-    } = userData;
-
-    const savedTheme = localStorage.getItem("theme");
-    localStorage.clear();
-    if (savedTheme) {
-    localStorage.setItem("theme", savedTheme);
-    }
-
-
-    localStorage.setItem("username", username);
-    localStorage.setItem("arabic_name", arabic_name);
-    localStorage.setItem("role", role);
-    localStorage.setItem("stage", stage);
-    localStorage.setItem("userID", userID);
-    localStorage.setItem("coupon", coupon_code);
-    localStorage.setItem("student_phone", student_phone);
-    localStorage.setItem("father_phone", father_phone);
-    localStorage.setItem("user_code", user_code);
-    localStorage.setItem("points", points.toString());
-    localStorage.setItem("referred_by", referred_by);
-
-    // تحديث القيم في الذاكرة
-    setUsername(username);
-    setRole(role);
-    setStage(stage);
-    setUserID(userID);
-    setStudentPhone(student_phone);
-    setFatherPhone(father_phone);
-    setUserCode(user_code);
-    setPoints(points);
-    setReferredBy(referred_by);
-
-    window.dispatchEvent(new Event("storage"));
+  username = userData.username || "";
+  arabic_name = userData.arabic_name || "";
+  role = userData.role || "guest";
+  stage = userData.stage || "student";
+  userID = userData.userID || "";
+  coupon = userData.coupon_code || "";
+  studentPhone = userData.student_phone || "";
+  fatherPhone = userData.father_phone || "";
+  userCode = userData.user_code || "";
+  points = parseInt(userData.points || 0);
+  referredBy = userData.referred_by || "";
 };
 
-// ✅ التأكد من تسجيل الدخول
-const isAuthenticated = () => {
-    return !!localStorage.getItem("role");
+// ✅ تحميل البيانات مرة واحدة عند بدء التشغيل
+const initUserData = async () => {
+  try {
+    const data = await fetchWithAuth("/auth/me");
+    console.log("🔍 fetched user data:", data);
+    setUserData(data.user); // أو data حسب النتيجة
+  } catch (err) {
+    console.error("❌ Failed to fetch user data:", err.message);
+  }
+};
+
+
+// ✅ تسجيل الدخول
+const login = async (username, password) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Login failed");
+
+    setUserData(data.user);
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
 };
 
 // ✅ تسجيل الخروج
 const logout = async () => {
-    try {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-            method: "POST",
-            credentials: "include",
-        });
-    } catch (err) {
-        console.error("Logout error:", err.message);
-    }
+  try {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (err) {
+    console.error("Logout error:", err.message);
+  }
 
-    // تنظيف localStorage
-    const savedTheme = localStorage.getItem("theme");
-    localStorage.clear();
-    if (savedTheme) {
-    localStorage.setItem("theme", savedTheme);
-    }
+  username = arabic_name = role = stage = userID = coupon = studentPhone = fatherPhone = userCode = referredBy = "";
+  points = 0;
 
-    role = username = stage = userID = coupon = studentPhone = fatherPhone = userCode = referredBy = "";
-    points = 0;
-
-    window.location.href = mainPath;
+  window.location.href = mainPath;
 };
 
 // ✅ دالة التسجيل
 const register = async (userData) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userData),
-        });
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Registration failed");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Registration failed");
 
-        return { success: true, message: data.message };
-    } catch (error) {
-        return { success: false, message: error.message };
-    }
+    return { success: true, message: data.message };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
 };
 
-// ✅ دالة تسجيل الدخول
-const login = async (username, password) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ username, password }),
-        });
+// ✅ دالة فحص المصادقة
+const isAuthenticated = () => role && role !== "guest";
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Login failed");
-
-        setUserData(data.user);
-
-        return { success: true };
-    } catch (error) {
-        return { success: false, message: error.message };
-    }
-};
-
-// ✅ استخرج CSRF Token من الكوكي
-function getCookie(name) {
+// ✅ دالة استخراج CSRF Token
+const getCookie = (name) => {
   const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
   return match ? match[2] : null;
-}
+};
 
-// ✅ دالة fetch مع تضمين CSRF Token في POST و PUT
+// ✅ fetch مخصص بالتوكن
 const fetchWithAuth = async (url, options = {}) => {
   const method = (options.method || "GET").toUpperCase();
   const csrfToken = getCookie("csrf_access_token");
@@ -219,7 +136,7 @@ const fetchWithAuth = async (url, options = {}) => {
   return data;
 };
 
-// ✅ دوال get للبيانات
+// ✅ getters
 const getRole = () => role;
 const getUserID = () => userID;
 const getStage = () => stage;
@@ -234,45 +151,27 @@ const getReferredBy = () => referredBy;
 
 // ✅ تصدير شامل
 export {
-    role,
-    username,
-    arabic_name,
-    stage,
-    userID,
-    coupon,
-    studentPhone,
-    fatherPhone,
-    userCode,
-    points,
-    referredBy,
-    setUserCode,
-    setRole,
-    mainPath,
-    subscription,
-    averageMark,
-    API_BASE_URL,
-    fetchWithAuth,
-    isAuthenticated,
-    logout,
-    register,
-    login,
-    setUserData,
-    setUsername,
-    setStage,
-    setUserID,
-    setStudentPhone,
-    setFatherPhone,
-    setPoints,
-    setReferredBy,
-    getUsername,
-    getArabicName,
-    getRole,
-    getStage,
-    getUserID,
-    getCoupon,
-    getStudentPhone,
-    getFatherPhone,
-    getUserCode,
-    getPoints,
-    getReferredBy,
+  mainPath,
+  subscription,
+  averageMark,
+  API_BASE_URL,
+  fetchWithAuth,
+  isAuthenticated,
+  logout,
+  register,
+  login,
+  initUserData,
+  setUserData,
+  // getters
+  getUsername,
+  getArabicName,
+  getRole,
+  getStage,
+  getUserID,
+  getCoupon,
+  getStudentPhone,
+  getFatherPhone,
+  getUserCode,
+  getPoints,
+  getReferredBy,
 };

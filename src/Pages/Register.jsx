@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
-import { login } from "../utils";
+import { login, initUserData } from "../utils";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -71,6 +71,7 @@ function Register() {
       // تسجيل الدخول مباشرة بعد التسجيل
       const result = await login(username, password);
       if (result.success) {
+        await initUserData();
         navigate("/");
       } else {
         navigate("/login");

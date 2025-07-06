@@ -4,7 +4,7 @@ import './App.css';
 import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Loading from "./components/Loading";
-import { getRole, isAuthenticated } from "./utils";
+import { getRole, isAuthenticated, initUserData } from "./utils";
 import AccountSettings from "./Pages/AccountSettings";
 import UIReferencePage from './Pages/UiReferencePage';
 
@@ -19,26 +19,29 @@ function App() {
     const [userRole, setUserRole] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const detectRole = () => {
-        const role = isAuthenticated() ? getRole().trim().toLowerCase() : "guest";
-        return role;
-    };
-
     useEffect(() => {
-        const updateUserRole = () => {
-            const newRole = detectRole();
-            setUserRole(newRole);
+        const loadUser = async () => {
+            try {
+                await initUserData();
+            } catch (err) {
+                console.error("❌ Error loading user data:", err.message);
+            }
+
+            const role = isAuthenticated() ? getRole().trim().toLowerCase() : "guest";
+            setUserRole(role);
             setLoading(false);
         };
 
-        updateUserRole();
-        const storageListener = () => updateUserRole();
-        window.addEventListener("storage", storageListener);
-        const intervalId = setInterval(updateUserRole, 1000);
+        loadUser();
 
+        const storageListener = () => {
+            const updatedRole = isAuthenticated() ? getRole().trim().toLowerCase() : "guest";
+            setUserRole(updatedRole);
+        };
+
+        window.addEventListener("storage", storageListener);
         return () => {
             window.removeEventListener("storage", storageListener);
-            clearInterval(intervalId);
         };
     }, []);
 
