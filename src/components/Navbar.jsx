@@ -1,5 +1,3 @@
-// Navbar.jsx
-
 import { FiLogOut } from "react-icons/fi";
 import { mainPath, logout } from "../utils";
 import ThemeToggle from "./ThemeToggle";
