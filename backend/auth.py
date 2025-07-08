@@ -127,7 +127,7 @@ def refresh_token():
     set_access_cookies(response, access_token)
     return response
 
-# ✅ تسجيل الخروج مع إلغاء التوكنات
+# ✅ تسجيل الخروج بطريقة مضمونة
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required(verify_type=False)
 def logout():
@@ -136,8 +136,17 @@ def logout():
     db.session.commit()
 
     response = jsonify({"message": "تم تسجيل الخروج بنجاح"})
-    unset_jwt_cookies(response)
+
+    # ❌ مهم: لا تعتمد على unset_jwt_cookies وحده
+    # ✅ حذف يدوي 100%
+    response.set_cookie("access_token", "", max_age=0, expires=0, path="/", httponly=True, samesite="Lax", secure=False)
+    response.set_cookie("refresh_token", "", max_age=0, expires=0, path="/auth/refresh", httponly=True, samesite="Lax", secure=False)
+    response.set_cookie("csrf_access", "", max_age=0, expires=0, path="/", httponly=False, samesite="Lax", secure=False)
+    response.set_cookie("csrf_refresh", "", max_age=0, expires=0, path="/auth/refresh", httponly=False, samesite="Lax", secure=False)
+
     return response, 200
+
+
 
 # ✅ جلب المستخدم الحالي
 @auth_bp.route("/me", methods=["GET"])

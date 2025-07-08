@@ -1,14 +1,18 @@
+// Navbar.jsx
+
 import { FiLogOut } from "react-icons/fi";
-import { mainPath, logout } from "../utils";
 import ThemeToggle from "./ThemeToggle";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext"; // ✅
+import { mainPath } from "../utils";
 
 function Navbar() {
   const navigate = useNavigate();
+  const { logout } = useAuth(); // ✅
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    logout(); // حذف التوكن واليوزر من السياق
+    navigate("/"); // الرجوع للرئيسية
   };
 
   return (
@@ -19,15 +23,15 @@ function Navbar() {
 
       <div className="flex items-center gap-3 md:gap-4">
         <ThemeToggle />
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm md:text-base transition cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              تسجيل الخروج
-              <FiLogOut />
-            </div>
-          </button>
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm md:text-base transition cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            تسجيل الخروج
+            <FiLogOut />
+          </div>
+        </button>
       </div>
     </header>
   );

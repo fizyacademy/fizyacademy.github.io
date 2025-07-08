@@ -2,23 +2,23 @@
 
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { isAuthenticated } from "../utils";
 import ThemeToggle from "../components/ThemeToggle";
+import { useAuth } from "../AuthContext";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const loggedIn = isAuthenticated();
+  const { user } = useAuth(); // ✅ استخدم الكونتكست
 
   useEffect(() => {
-    if (loggedIn) {
+    if (user) {
       navigate("/", { replace: true });
     }
-  }, [loggedIn, navigate]);
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white transition-colors duration-300 flex items-center justify-center px-4">
       <div className="absolute top-4 left-4">
-        <ThemeToggle/>
+        <ThemeToggle />
       </div>
       <div className="text-center max-w-2xl">
         <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">

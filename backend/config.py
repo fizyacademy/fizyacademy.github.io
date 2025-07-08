@@ -4,13 +4,8 @@ from datetime import timedelta
 
 load_dotenv()
 
-# مسار مجلد backend (ملف config.py موجود جواه)
 basedir = os.path.abspath(os.path.dirname(__file__))
-
-# مجلد instance داخل backend
 instance_dir = os.path.join(basedir, "instance")
-
-# تأكد من وجود مجلد instance
 os.makedirs(instance_dir, exist_ok=True)
 
 class Config:
@@ -20,7 +15,6 @@ class Config:
         "DATABASE_URL",
         f"sqlite:///{os.path.join(instance_dir, 'database.db')}"
     )
-
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     JWT_SECRET_KEY = SECRET_KEY
@@ -30,6 +24,13 @@ class Config:
 
     JWT_TOKEN_LOCATION = ["cookies"]
 
+    # ✅ أسماء جديدة للكوكيز
+    JWT_ACCESS_COOKIE_NAME = "access_token"
+    JWT_REFRESH_COOKIE_NAME = "refresh_token"
+    JWT_ACCESS_CSRF_COOKIE_NAME = "csrf_access"
+    JWT_REFRESH_CSRF_COOKIE_NAME = "csrf_refresh"
+
+    # ✅ خصائص الكوكيز
     JWT_COOKIE_SECURE = False
     JWT_COOKIE_SAMESITE = "Lax"
     JWT_COOKIE_CSRF_PROTECT = True
@@ -42,5 +43,4 @@ class Config:
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
 
-# ✅ للسماح بالوصول إلى المسار من ملفات ثانية زي app.py
 Config.instance_dir = instance_dir

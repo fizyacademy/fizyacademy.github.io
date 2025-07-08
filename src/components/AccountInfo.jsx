@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
-import { fetchWithAuth } from "../utils";
+import { useAuth } from "../AuthContext"; // ✅
 
 const avatarImages = {
   boy_1: "/avatars/boy_1.png",
@@ -16,13 +15,7 @@ const avatarImages = {
 };
 
 function AccountInfo({ role: customRole, isCollapsed }) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    fetchWithAuth("/auth/me").then((data) => {
-      setUser(data.user);
-    });
-  }, []);
+  const { user } = useAuth(); // ✅ استخدام AuthContext
 
   const role = customRole || user?.role;
   const name = user?.arabic_name;
@@ -30,11 +23,7 @@ function AccountInfo({ role: customRole, isCollapsed }) {
   const avatarSrc = user?.avatar ? avatarImages[user.avatar] : null;
 
   return (
-    <div
-      className={`flex items-center gap-3 ${
-        isCollapsed ? "p-[1px]" : "p-3"
-      } transition-all rounded-xl`}
-    >
+    <div className={`flex items-center gap-3 ${isCollapsed ? "p-[1px]" : "p-3"} transition-all rounded-xl`}>
       <div className="bg-violet-600 dark:bg-violet-700 text-white p-1 rounded-full shadow">
         {avatarSrc ? (
           <img

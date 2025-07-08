@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -6,18 +6,11 @@ import Post from "../components/Post";
 import QuizBtn from "../components/QuizBtn";
 import AccountInfo from "../components/AccountInfo";
 import MobileBottomNav from "../components/MobileBottomNav";
-import { fetchWithAuth } from "../utils";
+import { useAuth } from "../AuthContext";
 
 function Student() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    fetchWithAuth("/auth/me")
-      .then(res => res.json())
-      .then(setUserData)
-      .catch(console.error);
-  }, []);
+  const { user } = useAuth(); // ✅ تم استبدال userData بـ user
 
   return (
     <div className="w-full min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white">
@@ -29,13 +22,13 @@ function Student() {
             <Post title="الحساب (طالب)" className="col-span-2 row-span-2" container showToggle>
               <AccountInfo />
             </Post>
-            <Post title="الصف الدراسي" body={userData?.stage || "جاري التحميل..."} className="col-span-2 row-span-1" />
-            <Post title="نوع الاشتراك" body={userData?.subscription || "جاري التحميل..."} className="col-span-1 row-span-1" showToggle />
+            <Post title="الصف الدراسي" body={user?.stage || "جاري التحميل..."} className="col-span-2 row-span-1" />
+            <Post title="نوع الاشتراك" body={user?.subscription || "جاري التحميل..."} className="col-span-1 row-span-1" showToggle />
             <Post
               title="التقييم الاجمالي"
               body={
                 <span className="flex gap-3 items-center">
-                  <div className="rounded-full w-4 h-4 bg-green-700"></div> {userData?.average_mark ?? "—"}
+                  <div className="rounded-full w-4 h-4 bg-green-700"></div> {user?.average_mark ?? "—"}
                 </span>
               }
               className="col-span-1 row-span-1"

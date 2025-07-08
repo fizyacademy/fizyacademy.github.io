@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { navLinks } from "../constants/navLinks";
-import { fetchWithAuth } from "../utils";
+import { useAuth } from "../AuthContext"; // ✅
 
 const iconMap = {
   home: "mdi:home",
@@ -21,6 +21,7 @@ const VISIBLE_COUNT = 5;
 
 const MobileBottomNav = () => {
   const location = useLocation();
+  const { user } = useAuth(); // ✅
   const [baseLinks, setBaseLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [startIndex, setStartIndex] = useState(0);
@@ -29,30 +30,19 @@ const MobileBottomNav = () => {
   let longPressTimeout = null;
 
   useEffect(() => {
-    fetchWithAuth("/auth/me")
-      .then((data) => {
-        const role = (data.user?.role) || "guest";
-        const links = [
-          ...(navLinks[role] || []),
-          { icon: "home", text: "الرئيسية", link: "/" },
-          { icon: "settings", text: "الإعدادات", link: "/settings" },
-          { icon: "account_circle", text: "الحساب", link: "/account" },
-        ];
-        setBaseLinks(links);
-      })
-      .catch(() => {
-        setBaseLinks([
-          { icon: "home", text: "الرئيسية", link: "/" },
-          { icon: "settings", text: "الإعدادات", link: "/settings" },
-          { icon: "account_circle", text: "الحساب", link: "/account" },
-        ]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    const role = user?.role || "guest";
+    const links = [
+      ...(navLinks[role] || []),
+      { icon: "home", text: "الرئيسية", link: "/" },
+      { icon: "settings", text: "الإعدادات", link: "/settings" },
+      { icon: "account_circle", text: "الحساب", link: "/account" },
+    ];
+    setBaseLinks(links);
+    setLoading(false);
+  }, [user]);
 
   useEffect(() => {
     if (baseLinks.length === 0) return;
-
     const activeIdx = baseLinks.findIndex((l) => l.link === location.pathname);
     if (activeIdx !== -1) {
       let newStart = (activeIdx - centerIndex + baseLinks.length) % baseLinks.length;

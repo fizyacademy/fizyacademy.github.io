@@ -1,24 +1,18 @@
 // Admin.jsx
 
-import { useEffect, useState } from 'react';
+import { useState } from "react";
 import PropTypes from "prop-types";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Post from "../components/Post";
 import AccountInfo from "../components/AccountInfo";
 import AdminApproval from "../components/AdminApproval";
-import MobileBottomNav from '../components/MobileBottomNav';
-import { fetchWithAuth } from "../utils";
+import MobileBottomNav from "../components/MobileBottomNav";
+import { useAuth } from "../AuthContext"; // ✅ استدعاء الكونتكست
 
 function Admin() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    fetchWithAuth("/auth/me")
-      .then(setUserData)
-      .catch(console.error);
-  }, []);
+  const { user } = useAuth(); // ✅ استخدام بيانات المستخدم
 
   return (
     <div className="w-full min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white">
@@ -33,7 +27,7 @@ function Admin() {
             </Post>
           </WidgetCont>
 
-          {userData?.username === "admin" && (
+          {user?.username === "admin" && (
             <WidgetCont>
               <Post title="المسؤولين" className="col-span-2 row-span-2" container showToggle>
                 <SimpleTable headers={["الاسم", "الحالة"]} rows={[["مسؤول 1", "نشط"], ["مسؤول 2", "غير نشط"]]} />
@@ -89,7 +83,7 @@ function Admin() {
             </Post>
           </WidgetCont>
 
-          {userData?.username === "admin" && (
+          {user?.username === "admin" && (
             <div>
               <AdminApproval />
             </div>

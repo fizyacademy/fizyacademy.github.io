@@ -1,22 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Post from "../components/Post";
 import AccountInfo from "../components/AccountInfo";
 import MobileBottomNav from "../components/MobileBottomNav";
-import { fetchWithAuth } from "../utils";
+import { useAuth } from "../AuthContext"; // ✅ استخدام AuthContext
 
 function Moderator() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    fetchWithAuth("/auth/me")
-      .then(res => res.json())
-      .then(setUserData)
-      .catch(console.error);
-  }, []);
+  const { user } = useAuth(); // ✅ بيانات المستخدم
 
   return (
     <div className="w-full min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white">
@@ -26,7 +19,7 @@ function Moderator() {
         <main className={`flex-1 transition-all duration-500 p-4 md:p-6 lg:p-8 space-y-6 pb-24 md:pb-6 ${isCollapsed ? "md:mr-[60px]" : "md:mr-[250px]"}`}>
           <WidgetCont>
             <Post title="الحساب (مشرف)" className="col-span-4 row-span-2" container showToggle>
-              <AccountInfo userData={userData} />
+              <AccountInfo userData={user} />
             </Post>
           </WidgetCont>
 
@@ -40,18 +33,30 @@ function Moderator() {
           </div>
 
           <WidgetCont>
-            <Post title="الطلاب" className="col-span-2 row-span-2" container showToggle>{/* جدول الطلاب */}</Post>
-            <Post title="الطلاب المتفوقين" className="col-span-2 row-span-2" container>{/* جدول المتفوقين */}</Post>
+            <Post title="الطلاب" className="col-span-2 row-span-2" container showToggle>
+              {/* جدول الطلاب */}
+            </Post>
+            <Post title="الطلاب المتفوقين" className="col-span-2 row-span-2" container>
+              {/* جدول المتفوقين */}
+            </Post>
           </WidgetCont>
 
           <WidgetCont>
-            <Post title="الطلاب المتوسطين" className="col-span-2 row-span-2" container>{/* جدول المتوسطين */}</Post>
-            <Post title="الطلاب الضعاف" className="col-span-2 row-span-2" container>{/* جدول الضعاف */}</Post>
+            <Post title="الطلاب المتوسطين" className="col-span-2 row-span-2" container>
+              {/* جدول المتوسطين */}
+            </Post>
+            <Post title="الطلاب الضعاف" className="col-span-2 row-span-2" container>
+              {/* جدول الضعاف */}
+            </Post>
           </WidgetCont>
 
           <WidgetCont>
-            <Post title="الاختبارات" className="col-span-2 row-span-2" container showToggle>{/* جدول الاختبارات */}</Post>
-            <Post title="الواجبات" className="col-span-2 row-span-2" container showToggle>{/* جدول الواجبات */}</Post>
+            <Post title="الاختبارات" className="col-span-2 row-span-2" container showToggle>
+              {/* جدول الاختبارات */}
+            </Post>
+            <Post title="الواجبات" className="col-span-2 row-span-2" container showToggle>
+              {/* جدول الواجبات */}
+            </Post>
           </WidgetCont>
         </main>
       </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiUser, FiLock, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
-import { login, initUserData } from "../utils";
+import { useAuth } from "../AuthContext";
 
 function Login() {
   const [username, setUser] = useState("");
@@ -12,19 +12,17 @@ function Login() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ استخدم الدالة من الكونتكست
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     const result = await login(username, password);
-
     if (!result.success) {
       setError(result.message);
       return;
     }
-
-    await initUserData(); // ✅ تأكد من تحميل بيانات المستخدم
 
     alert("✅ تم تسجيل الدخول بنجاح");
     navigate("/");
@@ -33,7 +31,6 @@ function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex items-center justify-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-md p-6 sm:p-8 space-y-6">
-        {/* Header */}
         <div className="flex justify-between items-center mb-2 sm:mb-4">
           <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">
             تسجيل الدخول
@@ -48,7 +45,6 @@ function Login() {
         )}
 
         <form onSubmit={handleLogin} className="space-y-4">
-          {/* Username */}
           <div>
             <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
               اسم المستخدم
@@ -68,7 +64,6 @@ function Login() {
             </div>
           </div>
 
-          {/* Password */}
           <div>
             <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
               كلمة المرور
@@ -95,7 +90,6 @@ function Login() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-md font-semibold transition cursor-pointer"
@@ -105,7 +99,6 @@ function Login() {
           </button>
         </form>
 
-        {/* Footer */}
         <p className="text-center text-sm sm:text-base text-gray-700 dark:text-gray-300">
           لا تملك حساب؟{" "}
           <a

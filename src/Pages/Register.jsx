@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
-import { login, initUserData } from "../utils";
+import { useAuth } from "../AuthContext"; // ✅
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -24,6 +24,8 @@ function Register() {
   const [gender, setGender] = useState("male");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const { login } = useAuth(); // ✅ login من context
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -68,11 +70,9 @@ function Register() {
 
       alert("✅ تم التسجيل بنجاح");
 
-      // تسجيل الدخول مباشرة بعد التسجيل
-      const result = await login(username, password);
+      const result = await login(username, password); // ✅ تسجيل الدخول عبر context
       if (result.success) {
-        await initUserData();
-        navigate("/");
+        navigate("/"); // ✅ توجيه المستخدم
       } else {
         navigate("/login");
       }
@@ -83,9 +83,7 @@ function Register() {
 
   const renderInput = (label, icon, fieldType, value, onChange) => (
     <div>
-      <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">
-        {label}
-      </label>
+      <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">{label}</label>
       <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
         <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
         <input
@@ -120,20 +118,12 @@ function Register() {
             country="eg"
             value={value}
             onChange={onChange}
-            inputProps={{
-              name,
-              required: true,
-            }}
-            inputClass="!pl-[0px] !w-full !bg-transparent py-6 !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none"
+            inputProps={{ name, required: true }}
+            inputClass="!pl-[0px] !w-full !bg-transparent py-6 !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none"
             containerClass="!w-full !bg-transparent !border-none !shadow-none"
-            buttonClass="!bg-transparent !border-none mr-5 hover:!bg-transparent focus:!bg-transparent active:!bg-transparent"
+            buttonClass="!bg-transparent !border-none mr-5 hover:!bg-transparent"
             dropdownClass="!bg-white dark:!bg-gray-700 !text-gray-800 dark:!text-white"
-            dropdownStyle={{
-              position: "absolute",
-              top: "auto",
-              bottom: "100%",
-              zIndex: 9999,
-            }}
+            dropdownStyle={{ position: "absolute", top: "auto", bottom: "100%", zIndex: 9999 }}
           />
         </div>
       </div>
@@ -143,7 +133,6 @@ function Register() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex items-center justify-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-2xl p-6 sm:p-8 space-y-6">
-        
         <div className="flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">
             إنشاء حساب جديد
@@ -163,7 +152,6 @@ function Register() {
               label="اختر الدور"
               value={role}
               onChange={setRole}
-              placeholder="اختر الدور"
               options={[
                 { value: "student", label: "طالب" },
                 { value: "moderator", label: "مشرف" },
@@ -175,7 +163,6 @@ function Register() {
               label="الجنس"
               value={gender}
               onChange={setGender}
-              placeholder="اختر الجنس"
               options={[
                 { value: "male", label: "ذكر" },
                 { value: "female", label: "أنثى" },

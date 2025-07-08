@@ -40,6 +40,7 @@ const PasswordModal = ({ onClose }) => {
 
     try {
       const data = await fetchWithAuth("/account/change-password", {
+        credentials: "include",
         method: "PUT",
         body: JSON.stringify(form),
       });

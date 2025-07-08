@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  FiUser,
-  FiMail,
-  FiPhone,
-  FiCheck,
-  FiEdit,
-  FiLock,
-  FiBook,
+  FiUser, FiMail, FiPhone, FiCheck, FiEdit, FiLock, FiBook
 } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import PhoneInput from "react-phone-input-2";
@@ -17,6 +11,7 @@ import Loading from "../components/Loading";
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
 import { fetchWithAuth } from "../utils";
+import { useAuth } from "../AuthContext";
 
 const stageOptions = [
   { value: "1st_sec", label: "الصف الأول الثانوي" },
@@ -38,7 +33,7 @@ const avatarImages = {
 };
 
 const AccountSettings = () => {
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useAuth(); // ✅ استخدم الكونتكست
   const [formData, setFormData] = useState({});
   const [editFields, setEditFields] = useState({});
   const [message, setMessage] = useState("");
@@ -46,21 +41,17 @@ const AccountSettings = () => {
   const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   useEffect(() => {
-    fetchWithAuth("/auth/me")
-      .then((data) => {
-        const userData = data.user || data; // التحقق إذا كان فيه user أو لا
-        setUser(userData);
-        setFormData({
-          arabic_name: userData.arabic_name || "",
-          student_phone: userData.student_phone || "",
-          father_phone: userData.father_phone || "",
-          stage: userData.stage || "",
-          email: userData.email || "",
-          avatar: userData.avatar || "boy_1",
-        });
-      })
-      .catch(() => setMessage("❌ فشل تحميل البيانات"));
-  }, []);
+    if (user) {
+      setFormData({
+        arabic_name: user.arabic_name || "",
+        student_phone: user.student_phone || "",
+        father_phone: user.father_phone || "",
+        stage: user.stage || "",
+        email: user.email || "",
+        avatar: user.avatar || "boy_1",
+      });
+    }
+  }, [user]);
 
   const isEditable = (field) => {
     if (!user) return false;
@@ -80,24 +71,22 @@ const AccountSettings = () => {
     setMessage("");
 
     const isAvatarChanged = formData.avatar !== user.avatar;
-    const hasChanges = isAvatarChanged || Object.keys(editFields).some((key) => editFields[key]);
+    const hasChanges =
+      isAvatarChanged || Object.keys(editFields).some((key) => editFields[key]);
 
     if (!hasChanges) {
       setMessage("⚠️ لا توجد تغييرات لحفظها");
       return;
     }
 
-
     try {
       const data = await fetchWithAuth("/account/update", {
+        credentials: "include",
         method: "PUT",
         body: JSON.stringify(formData),
       });
 
-      if (data.user) {
-        setUser(data.user);
-      }
-
+      if (data.user) setUser(data.user); // ✅ تحديث المستخدم في الكونتكست
       setMessage(data.message || "✅ تم الحفظ بنجاح");
       setEditFields({});
     } catch (err) {
@@ -105,107 +94,12 @@ const AccountSettings = () => {
     }
   };
 
-  const renderInput = (name, label, icon, type = "text") => (
-    <div>
-      <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
-      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
-        <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
-        <input
-          type={type}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          disabled={!editFields[name]}
-          className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none disabled:text-gray-400 py-3"
-        />
-        {isEditable(name) && (
-          <>
-            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-            <button
-              type="button"
-              onClick={() => toggleEdit(name)}
-              className="text-sm text-blue-600 underline cursor-pointer"
-            >
-              {editFields[name] ? <IoClose /> : <FiEdit />}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderPhone = (field, label, icon) => (
-    <div>
-      <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
-      <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-2 shadow-inner">
-        <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
-        <div className="w-full">
-          <PhoneInput
-            country="eg"
-            value={formData[field]}
-            onChange={(val) => setFormData({ ...formData, [field]: val })}
-            inputProps={{
-              name: field,
-              required: true,
-              disabled: !editFields[field],
-            }}
-            inputClass="!pl-[0px] !w-full !bg-transparent !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none disabled:!text-gray-400 disabled:!cursor-default !py-6"
-            containerClass="!w-full !bg-transparent !border-none !shadow-none"
-            buttonClass="!bg-transparent !border-none mr-5 cursor-pointer disabled:cursor-default"
-            dropdownClass="!bg-white dark:!bg-gray-700 !text-gray-800 dark:!text-white"
-            dropdownStyle={{
-              position: "absolute",
-              top: "auto",
-              bottom: "100%",
-              zIndex: 9999,
-            }}
-          />
-        </div>
-        {isEditable(field) && (
-          <>
-            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-            <button
-              type="button"
-              onClick={() => toggleEdit(field)}
-              className="text-sm text-blue-600 underline cursor-pointer pl-[5px]"
-            >
-              {editFields[field] ? <IoClose /> : <FiEdit />}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderStage = () => (
-    <div>
-      <label className="block mb-1 text-gray-800 dark:text-white">المرحلة الدراسية</label>
-      <CustomSelect
-        value={formData.stage}
-        onChange={(val) => setFormData({ ...formData, stage: val })}
-        options={stageOptions}
-        icon={<FiBook />}
-        isDisabled={!editFields.stage}
-        editButton={
-          isEditable("stage") && (
-            <button
-              type="button"
-              onClick={() => toggleEdit("stage")}
-              className="text-sm text-blue-600 underline cursor-pointer"
-            >
-              {editFields["stage"] ? <IoClose /> : <FiEdit />}
-            </button>
-          )
-        }
-      />
-    </div>
-  );
-
   if (!user) return <Loading />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex justify-center items-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-5xl p-8 flex flex-col md:flex-row gap-10">
+        {/* Avatar */}
         <div className="flex flex-col items-center">
           <div className="relative group cursor-pointer" onClick={() => setShowAvatarModal(true)}>
             <img
@@ -219,6 +113,7 @@ const AccountSettings = () => {
           </div>
         </div>
 
+        {/* Form */}
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">إعدادات الحساب</h2>
@@ -241,9 +136,7 @@ const AccountSettings = () => {
           </form>
 
           {message && (
-            <p className="text-center font-bold mt-4 text-violet-700 dark:text-violet-300">
-              {message}
-            </p>
+            <p className="text-center font-bold mt-4 text-violet-700 dark:text-violet-300">{message}</p>
           )}
 
           <div className="text-center mt-6">
@@ -251,8 +144,7 @@ const AccountSettings = () => {
               onClick={() => setShowPasswordModal(true)}
               className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-md font-semibold transition cursor-pointer"
             >
-              <FiLock />
-              تغيير كلمة المرور
+              <FiLock /> تغيير كلمة المرور
             </button>
           </div>
         </div>
@@ -271,6 +163,106 @@ const AccountSettings = () => {
       )}
     </div>
   );
+
+  // --- المكونات الفرعية ---
+
+  function renderInput(name, label, icon, type = "text") {
+    return (
+      <div>
+        <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
+        <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
+          <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
+          <input
+            type={type}
+            name={name}
+            value={formData[name]}
+            onChange={handleChange}
+            disabled={!editFields[name]}
+            className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none disabled:text-gray-400 py-3"
+          />
+          {isEditable(name) && (
+            <>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+              <button type="button" onClick={() => toggleEdit(name)} className="text-sm text-blue-600 underline cursor-pointer">
+                {editFields[name] ? <IoClose /> : <FiEdit />}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function renderPhone(field, label, icon) {
+    return (
+      <div>
+        <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
+        <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-2 shadow-inner">
+          <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
+          <div className="w-full">
+            <PhoneInput
+              country="eg"
+              value={formData[field]}
+              onChange={(val) => setFormData({ ...formData, [field]: val })}
+              inputProps={{
+                name: field,
+                required: true,
+                disabled: !editFields[field],
+              }}
+              inputClass="!pl-[0px] !w-full !bg-transparent !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none !ring-0 focus:!ring-0 focus:!outline-none disabled:!text-gray-400 disabled:!cursor-default !py-6"
+              containerClass="!w-full !bg-transparent !border-none !shadow-none"
+              buttonClass="!bg-transparent !border-none mr-5 cursor-pointer disabled:cursor-default"
+              dropdownClass="!bg-white dark:!bg-gray-700 !text-gray-800 dark:!text-white"
+              dropdownStyle={{
+                position: "absolute",
+                top: "auto",
+                bottom: "100%",
+                zIndex: 9999,
+              }}
+            />
+          </div>
+          {isEditable(field) && (
+            <>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+              <button
+                type="button"
+                onClick={() => toggleEdit(field)}
+                className="text-sm text-blue-600 underline cursor-pointer pl-[5px]"
+              >
+                {editFields[field] ? <IoClose /> : <FiEdit />}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function renderStage() {
+    return (
+      <div>
+        <label className="block mb-1 text-gray-800 dark:text-white">المرحلة الدراسية</label>
+        <CustomSelect
+          value={formData.stage}
+          onChange={(val) => setFormData({ ...formData, stage: val })}
+          options={stageOptions}
+          icon={<FiBook />}
+          isDisabled={!editFields.stage}
+          editButton={
+            isEditable("stage") && (
+              <button
+                type="button"
+                onClick={() => toggleEdit("stage")}
+                className="text-sm text-blue-600 underline cursor-pointer"
+              >
+                {editFields["stage"] ? <IoClose /> : <FiEdit />}
+              </button>
+            )
+          }
+        />
+      </div>
+    );
+  }
 };
 
 export default AccountSettings;
