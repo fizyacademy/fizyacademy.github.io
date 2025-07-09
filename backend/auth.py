@@ -9,7 +9,6 @@ from flask_jwt_extended import (
     jwt_required,
     set_access_cookies,
     set_refresh_cookies,
-    unset_jwt_cookies,
     get_jwt
 )
 from models import User, TokenBlocklist
@@ -137,7 +136,6 @@ def logout():
 
     response = jsonify({"message": "تم تسجيل الخروج بنجاح"})
 
-    # ❌ مهم: لا تعتمد على unset_jwt_cookies وحده
     # ✅ حذف يدوي 100%
     response.set_cookie("access_token", "", max_age=0, expires=0, path="/", httponly=True, samesite="Lax", secure=False)
     response.set_cookie("refresh_token", "", max_age=0, expires=0, path="/auth/refresh", httponly=True, samesite="Lax", secure=False)
