@@ -18,10 +18,9 @@ const BackButton = ({ className = "" }) => {
     return (
         <button
             onClick={handleBack}
-            className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-2xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 shadow transition ${className}`}
+            className={`cursor-pointer flex items-center gap-2 px-4 py-[8px] rounded-2xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 shadow transition ${className}`}
             >
             <ArrowLeft size={20} />
-            رجوع
             </button>
         );
 };
