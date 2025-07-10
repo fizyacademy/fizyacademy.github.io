@@ -74,7 +74,7 @@ def update_profile():
         return jsonify({"message": "دور غير مصرح به"}), 403
 
     db.session.commit()
-    return jsonify({"message": "تم تحديث البيانات بنجاح", "user": user.to_dict()}), 200
+    return jsonify({"message": "تم تحديث البيانات بنجاح ✅", "user": user.to_dict()}), 200
 
 @account_bp.route("/change-password", methods=["PUT"])
 @jwt_required()

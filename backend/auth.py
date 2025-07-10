@@ -130,13 +130,28 @@ def refresh_token():
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required(verify_type=False)
 def logout():
-    jti = get_jwt()["jti"]
+    jwt_data = get_jwt()
+    jti = jwt_data["jti"]
+    token_type = jwt_data["type"]
+
+    # أضف التوكن الحالي (access أو refresh) إلى البلوك ليست
     db.session.add(TokenBlocklist(jti=jti, created_at=datetime.utcnow()))
+
+    # إذا كان access token، حاول إلغاء refresh أيضًا من الكوكيز
+    if token_type == "access":
+        refresh_token = request.cookies.get("refresh_token")
+        if refresh_token:
+            from flask_jwt_extended import decode_token
+            try:
+                decoded_refresh = decode_token(refresh_token)
+                db.session.add(TokenBlocklist(jti=decoded_refresh["jti"], created_at=datetime.utcnow()))
+            except Exception as e:
+                pass  # تجاهل أي خطأ في حال كان التوكن منتهي أو غير صالح
+
     db.session.commit()
 
+    # حذف الكوكيز يدويًا
     response = jsonify({"message": "تم تسجيل الخروج بنجاح"})
-
-    # ✅ حذف يدوي 100%
     response.set_cookie("access_token", "", max_age=0, expires=0, path="/", httponly=True, samesite="Lax", secure=False)
     response.set_cookie("refresh_token", "", max_age=0, expires=0, path="/auth/refresh", httponly=True, samesite="Lax", secure=False)
     response.set_cookie("csrf_access", "", max_age=0, expires=0, path="/", httponly=False, samesite="Lax", secure=False)

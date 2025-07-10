@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }) => {
     document.cookie = "csrf_access=; Max-Age=0; path=/";
     document.cookie = "csrf_refresh=; Max-Age=0; path=/";
 
-
     setUser(null);
   };
 
@@ -45,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
