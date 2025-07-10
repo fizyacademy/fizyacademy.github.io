@@ -19,8 +19,8 @@ class Config:
 
     JWT_SECRET_KEY = SECRET_KEY
 
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2)
 
     JWT_TOKEN_LOCATION = ["cookies"]
 

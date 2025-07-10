@@ -12,6 +12,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
 import { fetchWithAuth } from "../utils";
 import { useAuth } from "../AuthContext";
+import BackButton from "../components/BackButton";
 
 const stageOptions = [
   { value: "1st_sec", label: "الصف الأول الثانوي" },
@@ -117,7 +118,10 @@ const AccountSettings = () => {
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">إعدادات الحساب</h2>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <BackButton />
+            </div>
           </div>
 
           <form onSubmit={handleUpdate} className="space-y-4">

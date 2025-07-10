@@ -1,3 +1,5 @@
+// AuthContext.jsx
+
 import { createContext, useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { fetchWithAuth, login as loginAPI, logout as logoutAPI } from "./utils";
