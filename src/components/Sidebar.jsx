@@ -9,22 +9,23 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import MobileBottomNav from "./MobileBottomNav";
 import { navLinks } from "../constants/navLinks";
-import { useAuth } from "../AuthContext"; // ✅
+import { useAuth } from "../AuthContext";
 
 function Sidebar({ isCollapsed, setIsCollapsed }) {
   const [showSidebar, setShowSidebar] = useState(true);
   const [extraLinks, setExtraLinks] = useState([]);
+  const [showText, setShowText] = useState(!isCollapsed);
 
   const navigate = useNavigate();
-  const { user, logout } = useAuth(); // ✅
+  const { user, logout } = useAuth();
 
-  // ✅ تحديد الروابط حسب الدور
+  // تحديد الروابط حسب الدور
   useEffect(() => {
     const role = user?.role || "guest";
     setExtraLinks(navLinks[role] || []);
   }, [user]);
 
-  // ✅ مراقبة حجم الشاشة
+  // مراقبة حجم الشاشة
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -39,9 +40,19 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // تأخير ظهور النص بعد التوسيع
+  useEffect(() => {
+    if (!isCollapsed) {
+      const timeout = setTimeout(() => setShowText(true), 300); // نفس مدة الترانزيشن
+      return () => clearTimeout(timeout);
+    } else {
+      setShowText(false);
+    }
+  }, [isCollapsed]);
+
   const handleLogout = () => {
     logout();
-    navigate("/")
+    navigate("/");
   };
 
   if (!showSidebar) return <MobileBottomNav />;
@@ -79,19 +90,35 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
 
       <div className="mt-auto p-2 flex flex-col gap-2">
         <Link
-          to={"settings"}
-          className="flex items-center justify-center gap-2 bg-violet-800/80 dark:bg-violet-800 backdrop-blur rounded-lg px-3 py-2 text-lg text-white hover:bg-violet-700 dark:hover:bg-violet-900 transition"
+          to="settings"
+          className={`flex items-center justify-center gap-2 bg-violet-800/80 dark:bg-violet-800 backdrop-blur rounded-lg py-2 text-lg text-white hover:bg-violet-700 dark:hover:bg-violet-900 transition ${
+            isCollapsed ? "px-3" : "pl-3"
+          }`}
         >
-          <FiSettings />
-          {!isCollapsed && <span>الإعدادات</span>}
+          {!isCollapsed ? (
+            <div className="flex flex-0 h-full border-l-2 border-amber-50 px-3 text-center items-center right-0">
+              <FiSettings />
+            </div>
+          ) : (
+            <FiSettings />
+          )}
+          {showText && <span className="flex-1 text-center">الإعدادات</span>}
         </Link>
 
         <button
           onClick={handleLogout}
-          className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg px-3 py-2 text-lg transition cursor-pointer"
+          className={`flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-lg py-2 text-lg transition cursor-pointer ${
+            isCollapsed ? "px-3" : "pl-3"
+          }`}
         >
-          <FiLogOut />
-          {!isCollapsed && <span>تسجيل الخروج</span>}
+          {!isCollapsed ? (
+            <div className="flex flex-0 h-full border-l-2 border-amber-50 px-3 text-center items-center right-0">
+              <FiLogOut />
+            </div>
+          ) : (
+            <FiLogOut />
+          )}
+          {showText && <span className="flex-1 text-center">تسجيل الخروج</span>}
         </button>
       </div>
     </div>

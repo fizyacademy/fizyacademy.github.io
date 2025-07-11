@@ -9,7 +9,9 @@ import {
 } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
-import { useAuth } from "../AuthContext"; // ✅
+import { useAuth } from "../AuthContext";
+import toast from "react-hot-toast"; // ✅ لعرض toast.promise
+import { showError } from "../components/Toast"; // ✅ لعرض الأخطاء بشكل موحد
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -22,24 +24,22 @@ function Register() {
   const [fatherPhone, setFatherPhone] = useState("");
   const [role, setRole] = useState("student");
   const [gender, setGender] = useState("male");
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login } = useAuth(); // ✅ login من context
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (password !== confirmPassword) {
-      setError("كلمة المرور غير متطابقة");
+      showError("كلمة المرور غير متطابقة");
       return;
     }
 
     const arabicRegex = /^[\u0600-\u06FF]{2,}(?:\s+[\u0600-\u06FF]{2,}){2,}$/;
     if (!arabicRegex.test(arabic_name)) {
-      setError("يرجى إدخال اسم ثلاثي باللغة العربية فقط.");
+      showError("يرجى إدخال اسم ثلاثي باللغة العربية فقط.");
       return;
     }
 
@@ -59,25 +59,32 @@ function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-      });
+      await toast.promise(
+        fetch("http://localhost:5000/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "فشل التسجيل");
+          return data;
+        }),
+        {
+          loading: "جارٍ إنشاء الحساب...",
+          success: "تم إنشاء الحساب بنجاح",
+          error: (err) => err.message || "حدث خطأ أثناء التسجيل",
+        }
+      );
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "فشل التسجيل");
-
-      alert("✅ تم التسجيل بنجاح");
-
-      const result = await login(username, password); // ✅ تسجيل الدخول عبر context
+      // تسجيل الدخول بعد نجاح التسجيل
+      const result = await login(username, password);
       if (result.success) {
-        navigate("/"); // ✅ توجيه المستخدم
+        navigate("/");
       } else {
         navigate("/login");
       }
-    } catch (err) {
-      setError(err.message);
+    } catch {
+      // الخطأ تم عرضه من toast
     }
   };
 
@@ -139,12 +146,6 @@ function Register() {
           </h2>
           <ThemeToggle />
         </div>
-
-        {error && (
-          <p className="text-center font-semibold text-red-500 dark:text-red-400">
-            {error}
-          </p>
-        )}
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

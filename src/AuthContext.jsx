@@ -23,11 +23,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     const result = await loginAPI(username, password);
-    if (result.success) {
-      await initUser(); // إعادة تحميل بيانات المستخدم بعد تسجيل الدخول
+    if (!result.success) {
+      throw new Error(result.message || "فشل تسجيل الدخول");
     }
+    await initUser();
     return result;
   };
+
 
   const logout = async () => {
     await logoutAPI();

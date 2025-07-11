@@ -5,28 +5,34 @@ import { useNavigate } from "react-router-dom";
 import { FiUser, FiLock, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
 import { useAuth } from "../AuthContext";
+import toast from "react-hot-toast"; // لاستخدام toast.promise
 
 function Login() {
   const [username, setUser] = useState("");
   const [password, setPass] = useState("");
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ استخدم الدالة من الكونتكست
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
 
-    const result = await login(username, password);
-    if (!result.success) {
-      setError(result.message);
-      return;
+    try {
+      await toast.promise(
+        login(username, password),
+        {
+          loading: "جارٍ تسجيل الدخول...",
+          success: "تم تسجيل الدخول بنجاح",
+          error: (err) => err.message || "فشل تسجيل الدخول",
+        }
+      );
+
+      navigate("/");
+    } catch {
+      // الخطأ اتعرض بالفعل في toast، فمش لازم showError هنا
     }
-
-    alert("✅ تم تسجيل الدخول بنجاح");
-    navigate("/");
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex items-center justify-center text-gray-900 dark:text-white">
@@ -37,12 +43,6 @@ function Login() {
           </h2>
           <ThemeToggle />
         </div>
-
-        {error && (
-          <p className="text-center font-semibold text-red-500 dark:text-red-400">
-            {error}
-          </p>
-        )}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
