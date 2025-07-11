@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { FiUser, FiLock, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToggle";
 import { useAuth } from "../AuthContext";
-import toast from "react-hot-toast"; // لاستخدام toast.promise
+import { showPromise } from "../components/Toast"; // ✅ استخدام showPromise
 
 function Login() {
   const [username, setUser] = useState("");
@@ -18,7 +18,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      await toast.promise(
+      await showPromise(
         login(username, password),
         {
           loading: "جارٍ تسجيل الدخول...",
@@ -29,10 +29,9 @@ function Login() {
 
       navigate("/");
     } catch {
-      // الخطأ اتعرض بالفعل في toast، فمش لازم showError هنا
+      // الخطأ تم عرضه في التوست
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex items-center justify-center text-gray-900 dark:text-white">

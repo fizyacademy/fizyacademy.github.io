@@ -10,6 +10,7 @@ import { FiSettings, FiLogOut } from "react-icons/fi";
 import MobileBottomNav from "./MobileBottomNav";
 import { navLinks } from "../constants/navLinks";
 import { useAuth } from "../AuthContext";
+import { showSuccess } from "./Toast";
 
 function Sidebar({ isCollapsed, setIsCollapsed }) {
   const [showSidebar, setShowSidebar] = useState(true);
@@ -53,6 +54,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
   const handleLogout = () => {
     logout();
     navigate("/");
+    setTimeout(() => {
+      showSuccess("تم تسجيل الخروج")
+    }, 1000);
   };
 
   if (!showSidebar) return <MobileBottomNav />;

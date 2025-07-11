@@ -5,6 +5,7 @@ import ThemeToggle from "./ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext"; // ✅
 import { mainPath } from "../utils";
+import { showSuccess } from "./Toast";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ function Navbar() {
   const handleLogout = () => {
     logout(); // حذف التوكن واليوزر من السياق
     navigate("/"); // الرجوع للرئيسية
+    setTimeout(() => {
+      showSuccess("تم تسجيل الخروج")
+    }, 1000);
   };
 
   return (
@@ -29,7 +33,9 @@ function Navbar() {
         >
           <div className="flex items-center gap-2">
             تسجيل الخروج
-            <FiLogOut />
+            <div className="border-r-1 pr-2">
+              <FiLogOut />
+            </div>
           </div>
         </button>
       </div>
