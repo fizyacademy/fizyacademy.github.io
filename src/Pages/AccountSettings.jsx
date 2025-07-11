@@ -10,9 +10,10 @@ import AvatarModal from "../components/AvatarModal";
 import Loading from "../components/Loading";
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
+import BackButton from "../components/BackButton";
 import { fetchWithAuth } from "../utils";
 import { useAuth } from "../AuthContext";
-import BackButton from "../components/BackButton";
+import { showPromise, showInfo } from "../components/Toast";
 
 const stageOptions = [
   { value: "1st_sec", label: "الصف الأول الثانوي" },
@@ -34,10 +35,9 @@ const avatarImages = {
 };
 
 const AccountSettings = () => {
-  const { user, setUser } = useAuth(); // ✅ استخدم الكونتكست
+  const { user, setUser } = useAuth();
   const [formData, setFormData] = useState({});
   const [editFields, setEditFields] = useState({});
-  const [message, setMessage] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
 
@@ -68,39 +68,48 @@ const AccountSettings = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    setMessage("");
+  e.preventDefault();
 
-    const isAvatarChanged = formData.avatar !== user.avatar;
+  const isAvatarChanged = formData.avatar !== user.avatar;
     const hasChanges =
       isAvatarChanged || Object.keys(editFields).some((key) => editFields[key]);
 
     if (!hasChanges) {
-      setMessage("⚠️ لا توجد تغييرات لحفظها");
+      showInfo("لا توجد تغييرات لحفظها");
       return;
     }
 
-    try {
-      const data = await fetchWithAuth("/account/update", {
-        credentials: "include",
-        method: "PUT",
-        body: JSON.stringify(formData),
-      });
+    await showPromise(
+      (async () => {
+        const data = await fetchWithAuth("/account/update", {
+          credentials: "include",
+          method: "PUT",
+          body: JSON.stringify(formData),
+        });
 
-      if (data.user) setUser(data.user); // ✅ تحديث المستخدم في الكونتكست
-      setMessage(data.message || "✅ تم الحفظ بنجاح");
-      setEditFields({});
-    } catch (err) {
-      setMessage("❌ " + err.message);
-    }
+        if (!data.user) {
+          // رمي خطأ علشان toast.promise يعرف إنه fail
+          throw new Error(data.message || "فشل في تحديث البيانات");
+        }
+
+        setUser(data.user);
+        setEditFields({});
+        return data;
+      })(),
+      {
+        loading: "جارٍ تحديث البيانات...",
+        success: "تم الحفظ بنجاح",
+        error: "فشل في تحديث البيانات",
+      }
+    );
   };
+
 
   if (!user) return <Loading />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex justify-center items-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-5xl p-8 flex flex-col md:flex-row gap-10">
-        {/* Avatar */}
         <div className="flex flex-col items-center">
           <div className="relative group cursor-pointer" onClick={() => setShowAvatarModal(true)}>
             <img
@@ -114,7 +123,6 @@ const AccountSettings = () => {
           </div>
         </div>
 
-        {/* Form */}
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">إعدادات الحساب</h2>
@@ -138,10 +146,6 @@ const AccountSettings = () => {
               <FiCheck /> حفظ التغييرات
             </button>
           </form>
-
-          {message && (
-            <p className="text-center font-bold mt-4 text-violet-700 dark:text-violet-300">{message}</p>
-          )}
 
           <div className="text-center mt-6">
             <button
@@ -168,7 +172,7 @@ const AccountSettings = () => {
     </div>
   );
 
-  // --- المكونات الفرعية ---
+  // --- الحقول ---
 
   function renderInput(name, label, icon, type = "text") {
     return (

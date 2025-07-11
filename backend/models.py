@@ -46,7 +46,7 @@ class User(db.Model):
             "created_at": self.created_at.isoformat()
         }
 
-# ✅ جدول لتخزين التوكنات الملغاة (revoked)
+# جدول لتخزين التوكنات الملغاة (revoked)
 class TokenBlocklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(36), nullable=False, index=True)

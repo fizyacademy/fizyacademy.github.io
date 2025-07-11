@@ -7,8 +7,6 @@ import Loading from "./components/Loading";
 import { AuthProvider, useAuth } from "./AuthContext";
 import AccountSettings from "./Pages/AccountSettings";
 import UIReferencePage from './Pages/UiReferencePage';
-// import LecturesPage from './Pages/LecturesPage';
-import LectureRoutes from './components/LectureRoutes';
 
 const Student = lazy(() => import("./Pages/Student"));
 const Admin = lazy(() => import("./Pages/Admin"));
@@ -38,8 +36,6 @@ function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/account" element={<AccountSettings />} />
         <Route path="/ui-reference" element={<UIReferencePage />} />
-        {/* <Route path="/sessions" element={<LecturesPage />} /> */}
-        <Route path="/lectures/*" element={<LectureRoutes />} />
         <Route path="/*" element={RoleComponent} />
       </Routes>
 

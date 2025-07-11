@@ -16,28 +16,28 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # ✅ تفعيل CORS للسماح بالكوكيز في بيئة التطوير
+    # تفعيل CORS للسماح بالكوكيز في بيئة التطوير
     CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 
-    # ✅ تهيئة قواعد البيانات و JWT
+    # تهيئة قواعد البيانات و JWT
     db.init_app(app)
     jwt = JWTManager(app)
 
-    # ✅ التحقق من إلغاء التوكن (Token Revoking)
+    # التحقق من إلغاء التوكن (Token Revoking)
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
         jti = jwt_payload["jti"]
         return db.session.query(TokenBlocklist.id).filter_by(jti=jti).first() is not None
 
-    # ✅ تسجيل الـ Blueprints
+    # تسجيل الـ Blueprints
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(account_bp, url_prefix="/account")
 
-    # ✅ إنشاء مجلد قاعدة البيانات إن لم يكن موجود
+    # إنشاء مجلد قاعدة البيانات إن لم يكن موجود
     os.makedirs(instance_dir, exist_ok=True)
 
-    # ✅ إنشاء قاعدة البيانات + إضافة مسؤول افتراضي
+    # إنشاء قاعدة البيانات + إضافة مسؤول افتراضي
     with app.app_context():
         db.create_all()
 
@@ -57,7 +57,7 @@ def create_app():
 
     return app
 
-# ✅ إنشاء التطبيق وتشغيله محليًا
+# إنشاء التطبيق وتشغيله محليًا
 app = create_app()
 
 if __name__ == "__main__":

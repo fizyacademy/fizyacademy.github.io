@@ -1,7 +1,14 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { FiLock, FiCheck, FiX, FiEye, FiEyeOff } from "react-icons/fi";
-import { fetchWithAuth } from "../utils"; // ✅ استدعاء الدالة
+import {
+  FiLock,
+  FiCheck,
+  FiX,
+  FiEye,
+  FiEyeOff
+} from "react-icons/fi";
+import { fetchWithAuth } from "../utils";
+import { showSuccess, showError } from "../components/Toast"; // استيراد toast
 
 const PasswordModal = ({ onClose }) => {
   const [form, setForm] = useState({
@@ -9,7 +16,6 @@ const PasswordModal = ({ onClose }) => {
     new_password: "",
     confirm_password: "",
   });
-  const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -19,20 +25,19 @@ const PasswordModal = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMsg("");
 
     if (!form.current_password || !form.new_password || !form.confirm_password) {
-      setMsg("❌ جميع الحقول مطلوبة");
+      showError("جميع الحقول مطلوبة");
       return;
     }
 
     if (form.new_password.length < 6) {
-      setMsg("❌ كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل");
+      showError("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل");
       return;
     }
 
     if (form.new_password !== form.confirm_password) {
-      setMsg("❌ كلمتا المرور غير متطابقتين");
+      showError("كلمتا المرور غير متطابقتين");
       return;
     }
 
@@ -45,15 +50,19 @@ const PasswordModal = ({ onClose }) => {
         body: JSON.stringify(form),
       });
 
-      setMsg(data.message);
+      showSuccess(data.message || "تم تغيير كلمة المرور بنجاح");
+
       setForm({
         current_password: "",
         new_password: "",
         confirm_password: "",
       });
+      setTimeout(() => {
+        onClose(); // إغلاق المودال بعد النجاح
+      }, 3000);
     } catch (err) {
       console.error("خطأ:", err);
-      setMsg("❌ حدث خطأ أثناء تغيير كلمة المرور");
+      showError(err.message || "حدث خطأ أثناء تغيير كلمة المرور");
     } finally {
       setLoading(false);
     }
@@ -100,12 +109,6 @@ const PasswordModal = ({ onClose }) => {
           {renderInput("current_password", "كلمة المرور الحالية")}
           {renderInput("new_password", "كلمة المرور الجديدة")}
           {renderInput("confirm_password", "تأكيد كلمة المرور")}
-
-          {msg && (
-            <p className="text-sm text-center mt-2 text-red-600 dark:text-red-400">
-              {msg}
-            </p>
-          )}
 
           <div className="flex justify-between items-center mt-4">
             <button

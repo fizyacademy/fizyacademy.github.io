@@ -24,13 +24,13 @@ class Config:
 
     JWT_TOKEN_LOCATION = ["cookies"]
 
-    # ✅ أسماء جديدة للكوكيز
+    # أسماء جديدة للكوكيز
     JWT_ACCESS_COOKIE_NAME = "access_token"
     JWT_REFRESH_COOKIE_NAME = "refresh_token"
     JWT_ACCESS_CSRF_COOKIE_NAME = "csrf_access"
     JWT_REFRESH_CSRF_COOKIE_NAME = "csrf_refresh"
 
-    # ✅ خصائص الكوكيز
+    # خصائص الكوكيز
     JWT_COOKIE_SECURE = False
     JWT_COOKIE_SAMESITE = "Lax"
     JWT_COOKIE_CSRF_PROTECT = True

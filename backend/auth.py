@@ -18,7 +18,7 @@ from datetime import datetime
 
 auth_bp = Blueprint("auth", __name__)
 
-# ✅ توليد كوبون فريد
+# توليد كوبون فريد
 def generate_coupon_code(username):
     base = username[:5].lower()
     while True:
@@ -27,14 +27,14 @@ def generate_coupon_code(username):
         if not User.query.filter_by(coupon_code=coupon).first():
             return coupon
 
-# ✅ توليد كود مستخدم فريد
+# توليد كود مستخدم فريد
 def generate_unique_user_code():
     while True:
         code = "#" + str(random.randint(10000000, 99999999))
         if not User.query.filter_by(user_code=code).first():
             return code
 
-# ✅ تسجيل مستخدم جديد
+# تسجيل مستخدم جديد
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -91,7 +91,7 @@ def register():
     db.session.commit()
     return jsonify({"message": "تم التسجيل بنجاح"}), 201
 
-# ✅ تسجيل الدخول: Access + Refresh + Cookies
+# تسجيل الدخول: Access + Refresh + Cookies
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -115,7 +115,7 @@ def login():
     set_refresh_cookies(response, refresh_token)
     return response, 200
 
-# ✅ تجديد التوكن باستخدام Refresh Token
+# تجديد التوكن باستخدام Refresh Token
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh_token():
@@ -126,7 +126,7 @@ def refresh_token():
     set_access_cookies(response, access_token)
     return response
 
-# ✅ تسجيل الخروج بطريقة مضمونة
+# تسجيل الخروج بطريقة مضمونة
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required(verify_type=False)
 def logout():
@@ -161,7 +161,7 @@ def logout():
 
 
 
-# ✅ جلب المستخدم الحالي
+# جلب المستخدم الحالي
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
 def get_current_user():
