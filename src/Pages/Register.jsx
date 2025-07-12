@@ -10,8 +10,7 @@ import {
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
 import { useAuth } from "../AuthContext";
-import toast from "react-hot-toast"; // ✅ لعرض toast.promise
-import { showError } from "../components/Toast"; // ✅ لعرض الأخطاء بشكل موحد
+import { showError, showPromise } from "../components/Toast";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -59,7 +58,7 @@ function Register() {
     }
 
     try {
-      await toast.promise(
+      await showPromise(
         fetch("http://localhost:5000/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
