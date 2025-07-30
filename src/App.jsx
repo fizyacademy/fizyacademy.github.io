@@ -6,7 +6,6 @@ import { Toaster } from "react-hot-toast";
 import Loading from "./components/Loading";
 import { AuthProvider, useAuth } from "./AuthContext";
 import AccountSettings from "./Pages/AccountSettings";
-import StudentStatisticsPage from './Pages/StudentStatisticsPage';
 
 const Student = lazy(() => import("./Pages/Student"));
 const Admin = lazy(() => import("./Pages/Admin"));
@@ -35,7 +34,6 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/account" element={<AccountSettings />} />
-        <Route path="/my-progress" element={<StudentStatisticsPage />} />
         <Route path="/*" element={RoleComponent} />
       </Routes>
 
