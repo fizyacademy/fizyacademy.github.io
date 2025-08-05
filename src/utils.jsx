@@ -1,3 +1,5 @@
+// utils.jsx
+
 const API_BASE_URL = "http://localhost:5000";
 const mainPath = "http://localhost:5173"; // المسار الرئيسي للموقع
 

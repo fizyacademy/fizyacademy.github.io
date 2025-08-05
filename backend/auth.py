@@ -1,3 +1,4 @@
+# auth.py
 import os
 import random
 from datetime import datetime
@@ -22,11 +23,10 @@ google = oauth.register(
     name="google",
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
     client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-    access_token_url="https://oauth2.googleapis.com/token",
-    authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
-    userinfo_endpoint="https://www.googleapis.com/oauth2/v2/userinfo",
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
+
 
 # ------------------ Helpers ------------------
 
@@ -46,12 +46,12 @@ def generate_unique_user_code():
 
 # ------------------ Google OAuth ------------------
 
-@auth_bp.route("/auth/google-login")
+@auth_bp.route("google-login")
 def google_login_redirect():
     redirect_uri = url_for("auth.google_callback", _external=True)
     return google.authorize_redirect(redirect_uri)
 
-@auth_bp.route("/auth/google-callback")
+@auth_bp.route("google-callback")
 def google_callback():
     try:
         token = google.authorize_access_token()
