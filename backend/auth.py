@@ -1,6 +1,7 @@
-# auth.py
-
-from flask import Blueprint, request, jsonify
+import os
+import random
+from datetime import datetime
+from flask import Blueprint, request, jsonify, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (
     create_access_token,
@@ -11,14 +12,24 @@ from flask_jwt_extended import (
     set_refresh_cookies,
     get_jwt
 )
+from authlib.integrations.flask_client import OAuth
 from models import User, TokenBlocklist
 from db import db
-import random
-from datetime import datetime
 
 auth_bp = Blueprint("auth", __name__)
+oauth = OAuth()
+google = oauth.register(
+    name="google",
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    access_token_url="https://oauth2.googleapis.com/token",
+    authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
+    userinfo_endpoint="https://www.googleapis.com/oauth2/v2/userinfo",
+    client_kwargs={"scope": "openid email profile"},
+)
 
-# توليد كوبون فريد
+# ------------------ Helpers ------------------
+
 def generate_coupon_code(username):
     base = username[:5].lower()
     while True:
@@ -27,14 +38,49 @@ def generate_coupon_code(username):
         if not User.query.filter_by(coupon_code=coupon).first():
             return coupon
 
-# توليد كود مستخدم فريد
 def generate_unique_user_code():
     while True:
         code = "#" + str(random.randint(10000000, 99999999))
         if not User.query.filter_by(user_code=code).first():
             return code
 
-# تسجيل مستخدم جديد
+# ------------------ Google OAuth ------------------
+
+@auth_bp.route("/auth/google-login")
+def google_login_redirect():
+    redirect_uri = url_for("auth.google_callback", _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@auth_bp.route("/auth/google-callback")
+def google_callback():
+    try:
+        token = google.authorize_access_token()
+        resp = google.get("userinfo")
+        user_info = resp.json()
+        email = user_info.get("email")
+        name = user_info.get("name")
+
+        if not email:
+            return jsonify({"message": "لم يتم الحصول على البريد الإلكتروني"}), 400
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            return redirect(f"http://localhost:5173/complete-profile?email={email}&name={name}")
+
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+
+        response = redirect("http://localhost:5173/")
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
+        return response
+
+    except Exception as e:
+        return jsonify({"message": "حدث خطأ أثناء تسجيل الدخول بجوجل", "error": str(e)}), 500
+
+# ------------------ Auth Endpoints ------------------
+
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -49,7 +95,7 @@ def register():
         return jsonify({"message": "رقم الطالب مستخدم بالفعل"}), 400
 
     if data.get("father_phone") and data.get("student_phone"):
-        if data.get("student_phone") == data.get("father_phone"):
+        if data["student_phone"] == data["father_phone"]:
             return jsonify({"message": "رقم الطالب لا يجب أن يطابق رقم ولي الأمر"}), 400
 
     if len(data["password"]) < 6:
@@ -78,7 +124,8 @@ def register():
         points=0,
         gender=gender,
         avatar=default_avatar,
-        is_approved=True if data.get("role", "student") == "student" or data["username"] == "admin" else False
+        is_approved=True if data.get("role", "student") == "student" or data["username"] == "admin" else False,
+        is_complete=True
     )
 
     db.session.add(new_user)
@@ -91,13 +138,19 @@ def register():
     db.session.commit()
     return jsonify({"message": "تم التسجيل بنجاح"}), 201
 
-# تسجيل الدخول: Access + Refresh + Cookies
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    user = User.query.filter_by(username=data["username"]).first()
+    identifier = data.get("username")
+    password = data.get("password")
 
-    if not user or not check_password_hash(user.password, data["password"]):
+    user = (
+        User.query.filter_by(username=identifier).first()
+        or User.query.filter_by(email=identifier).first()
+        or User.query.filter_by(student_phone=identifier).first()
+    )
+
+    if not user or not check_password_hash(user.password, password):
         return jsonify({"message": "بيانات الدخول غير صحيحة"}), 401
 
     if not user.is_approved:
@@ -115,7 +168,49 @@ def login():
     set_refresh_cookies(response, refresh_token)
     return response, 200
 
-# تجديد التوكن باستخدام Refresh Token
+@auth_bp.route("/complete-profile", methods=["POST"])
+@jwt_required()
+def complete_profile():
+    user = User.query.get(get_jwt_identity())
+    if not user:
+        return jsonify({"message": "المستخدم غير موجود"}), 404
+
+    if user.is_complete:
+        return jsonify({"message": "تم إكمال البيانات مسبقًا"}), 400
+
+    data = request.get_json()
+    username = data.get("username")
+    arabic_name = data.get("arabic_name")
+    password = data.get("password")
+    student_phone = data.get("student_phone")
+    role = data.get("role")
+    gender = data.get("gender", "male")
+
+    if not username or not arabic_name or not student_phone or not role:
+        return jsonify({"message": "جميع الحقول مطلوبة"}), 400
+
+    if User.query.filter(User.username == username, User.id != user.id).first():
+        return jsonify({"message": "اسم المستخدم مستخدم بالفعل"}), 400
+
+    if User.query.filter(User.student_phone == student_phone, User.id != user.id).first():
+        return jsonify({"message": "رقم الهاتف مستخدم بالفعل"}), 400
+
+    user.username = username
+    user.arabic_name = arabic_name
+    user.student_phone = student_phone
+    user.role = role
+    user.gender = gender
+    user.avatar = "boy_1" if gender == "male" else "girl_1"
+    user.is_complete = True
+
+    if password:
+        if len(password) < 6:
+            return jsonify({"message": "كلمة المرور قصيرة جدًا"}), 400
+        user.password = generate_password_hash(password)
+
+    db.session.commit()
+    return jsonify({"message": "تم إكمال البيانات بنجاح", "user": user.to_dict()}), 200
+
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh_token():
@@ -126,7 +221,6 @@ def refresh_token():
     set_access_cookies(response, access_token)
     return response
 
-# تسجيل الخروج بطريقة مضمونة
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required(verify_type=False)
 def logout():
@@ -134,10 +228,8 @@ def logout():
     jti = jwt_data["jti"]
     token_type = jwt_data["type"]
 
-    # أضف التوكن الحالي (access أو refresh) إلى البلوك ليست
     db.session.add(TokenBlocklist(jti=jti, created_at=datetime.utcnow()))
 
-    # إذا كان access token، حاول إلغاء refresh أيضًا من الكوكيز
     if token_type == "access":
         refresh_token = request.cookies.get("refresh_token")
         if refresh_token:
@@ -145,23 +237,19 @@ def logout():
             try:
                 decoded_refresh = decode_token(refresh_token)
                 db.session.add(TokenBlocklist(jti=decoded_refresh["jti"], created_at=datetime.utcnow()))
-            except Exception as e:
-                pass  # تجاهل أي خطأ في حال كان التوكن منتهي أو غير صالح
+            except Exception:
+                pass
 
     db.session.commit()
 
-    # حذف الكوكيز يدويًا
     response = jsonify({"message": "تم تسجيل الخروج بنجاح"})
-    response.set_cookie("access_token", "", max_age=0, expires=0, path="/", httponly=True, samesite="Lax", secure=False)
-    response.set_cookie("refresh_token", "", max_age=0, expires=0, path="/auth/refresh", httponly=True, samesite="Lax", secure=False)
-    response.set_cookie("csrf_access", "", max_age=0, expires=0, path="/", httponly=False, samesite="Lax", secure=False)
-    response.set_cookie("csrf_refresh", "", max_age=0, expires=0, path="/auth/refresh", httponly=False, samesite="Lax", secure=False)
+    response.set_cookie("access_token", "", max_age=0, expires=0, path="/", httponly=True)
+    response.set_cookie("refresh_token", "", max_age=0, expires=0, path="/auth/refresh", httponly=True)
+    response.set_cookie("csrf_access", "", max_age=0, expires=0, path="/")
+    response.set_cookie("csrf_refresh", "", max_age=0, expires=0, path="/auth/refresh")
 
     return response, 200
 
-
-
-# جلب المستخدم الحالي
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
 def get_current_user():
