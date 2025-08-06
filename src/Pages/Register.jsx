@@ -7,7 +7,6 @@ import 'react-phone-input-2/lib/style.css';
 import {
   FiUser, FiMail, FiPhone, FiBook, FiLock, FiCheck, FiEye, FiEyeOff
 } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
 import ThemeToggle from "../components/ThemeToggle";
 import CustomSelect from "../components/CustomSelect";
 import { useAuth } from "../AuthContext";
@@ -84,10 +83,6 @@ function Register() {
     }
   };
 
-  const handleGoogleRegister = () => {
-    window.location.href = "http://localhost:5000/auth/google-login";
-  };
-
 
   const renderInput = (label, icon, type, value, onChange) => (
     <div>
@@ -143,21 +138,11 @@ function Register() {
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex items-center justify-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-2xl p-6 sm:p-8 space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">إنشاء حساب باستخدام جوجل</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">إنشاء حساب جديد</h2>
           <ThemeToggle />
         </div>
 
-        <button
-          onClick={handleGoogleRegister}
-          type="button"
-          className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md py-2 font-medium transition cursor-pointer"
-        >
-          <FcGoogle className="text-xl" />
-          التسجيل باستخدام Google
-        </button>
-
         <form onSubmit={handleRegister} className="space-y-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">أو إنشاء حساب جديد</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <CustomSelect
               label="اختر الدور"

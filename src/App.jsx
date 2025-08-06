@@ -1,12 +1,11 @@
 // App.jsx
 import './App.css';
 import { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Loading from "./components/Loading";
 import { AuthProvider, useAuth } from "./AuthContext";
 import AccountSettings from "./Pages/AccountSettings";
-import CompleteProfile from "./Pages/CompleteProfile"; // ✅ جديد
 
 const Student = lazy(() => import("./Pages/Student"));
 const Admin = lazy(() => import("./Pages/Admin"));
@@ -21,18 +20,6 @@ function AppRoutes() {
   if (loading) return <Loading />;
 
   const role = user?.role || "guest";
-  const isComplete = user?.is_complete;
-
-  if (user && !isComplete) {
-    return (
-      <Routes>
-        <Route path="/complete-profile" element={<CompleteProfile />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="*" element={<Navigate to="/complete-profile" replace />} />
-      </Routes>
-    );
-  }
 
   const RoleComponent = {
     admin: <Admin />,
@@ -47,7 +34,6 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/account" element={<AccountSettings />} />
-        <Route path="/complete-profile" element={<CompleteProfile />} />
         <Route path="/*" element={RoleComponent} />
       </Routes>
 

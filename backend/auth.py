@@ -1,8 +1,7 @@
 # auth.py
-import os
 import random
 from datetime import datetime
-from flask import Blueprint, request, jsonify, redirect, url_for
+from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (
     create_access_token,
@@ -13,23 +12,12 @@ from flask_jwt_extended import (
     set_refresh_cookies,
     get_jwt,
 )
-from authlib.integrations.flask_client import OAuth
 from models import User, TokenBlocklist
 from db import db
 
 auth_bp = Blueprint("auth", __name__)
-oauth = OAuth()
-google = oauth.register(
-    name="google",
-    client_id=os.getenv("GOOGLE_CLIENT_ID"),
-    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={"scope": "openid email profile"},
-)
-
 
 # ------------------ Helpers ------------------
-
 def generate_coupon_code(username):
     base = username[:5].lower()
     while True:
@@ -43,49 +31,6 @@ def generate_unique_user_code():
         code = "#" + str(random.randint(10000000, 99999999))
         if not User.query.filter_by(user_code=code).first():
             return code
-
-# ------------------ Google OAuth ------------------
-
-@auth_bp.route("google-login")
-def google_login_redirect():
-    redirect_uri = url_for("auth.google_callback", _external=True)
-    return google.authorize_redirect(redirect_uri)
-
-@auth_bp.route("google-callback")
-def google_callback():
-    try:
-        token = google.authorize_access_token(include_nonce=False)
-
-        # استدعاء metadata بطريقة صحيحة
-        userinfo_endpoint = google.load_server_metadata().get("userinfo_endpoint")
-        if not userinfo_endpoint:
-            return jsonify({"message": "لم يتم العثور على userinfo endpoint"}), 400
-
-        resp = google.get(userinfo_endpoint)
-        user_info = resp.json()
-
-        email = user_info.get("email")
-        name = user_info.get("name")
-
-        if not email:
-            return jsonify({"message": "لم يتم الحصول على البريد الإلكتروني"}), 400
-
-        user = User.query.filter_by(email=email).first()
-
-        if not user:
-            return redirect(f"http://localhost:5173/complete-profile?email={email}&name={name}")
-
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
-
-        response = redirect("http://localhost:5173/")
-        set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)
-        return response
-
-    except Exception as e:
-        return jsonify({"message": "حدث خطأ أثناء تسجيل الدخول بجوجل", "error": str(e)}), 500
-
 
 # ------------------ Auth Endpoints ------------------
 
@@ -175,49 +120,6 @@ def login():
     set_access_cookies(response, access_token)
     set_refresh_cookies(response, refresh_token)
     return response, 200
-
-@auth_bp.route("/complete-profile", methods=["POST"])
-@jwt_required()
-def complete_profile():
-    user = User.query.get(get_jwt_identity())
-    if not user:
-        return jsonify({"message": "المستخدم غير موجود"}), 404
-
-    if user.is_complete:
-        return jsonify({"message": "تم إكمال البيانات مسبقًا"}), 400
-
-    data = request.get_json()
-    username = data.get("username")
-    arabic_name = data.get("arabic_name")
-    password = data.get("password")
-    student_phone = data.get("student_phone")
-    role = data.get("role")
-    gender = data.get("gender", "male")
-
-    if not username or not arabic_name or not student_phone or not role:
-        return jsonify({"message": "جميع الحقول مطلوبة"}), 400
-
-    if User.query.filter(User.username == username, User.id != user.id).first():
-        return jsonify({"message": "اسم المستخدم مستخدم بالفعل"}), 400
-
-    if User.query.filter(User.student_phone == student_phone, User.id != user.id).first():
-        return jsonify({"message": "رقم الهاتف مستخدم بالفعل"}), 400
-
-    user.username = username
-    user.arabic_name = arabic_name
-    user.student_phone = student_phone
-    user.role = role
-    user.gender = gender
-    user.avatar = "boy_1" if gender == "male" else "girl_1"
-    user.is_complete = True
-
-    if password:
-        if len(password) < 6:
-            return jsonify({"message": "كلمة المرور قصيرة جدًا"}), 400
-        user.password = generate_password_hash(password)
-
-    db.session.commit()
-    return jsonify({"message": "تم إكمال البيانات بنجاح", "user": user.to_dict()}), 200
 
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)

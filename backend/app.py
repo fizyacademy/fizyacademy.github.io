@@ -10,7 +10,7 @@ from flask_jwt_extended import (
 )
 from config import Config, instance_dir
 from db import db
-from auth import auth_bp, oauth
+from auth import auth_bp
 from admin import admin_bp
 from account import account_bp
 from models import User, TokenBlocklist
@@ -27,7 +27,6 @@ def create_app():
     # تهيئة قواعد البيانات و JWT و OAuth
     db.init_app(app)
     jwt = JWTManager(app)
-    oauth.init_app(app)
 
     # التحقق من إلغاء التوكن (Token Revoking)
     @jwt.token_in_blocklist_loader
@@ -85,7 +84,6 @@ def create_app():
                 avatar="boy_1",
                 user_code="#00000001",
                 is_approved=True,
-                is_complete=True
             )
             db.session.add(default_admin)
             db.session.commit()

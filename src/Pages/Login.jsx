@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiUser, FiLock, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
 import ThemeToggle from "../components/ThemeToggle";
 import { useAuth } from "../AuthContext";
 import { showPromise } from "../components/Toast";
@@ -29,29 +28,15 @@ function Login() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google-login";
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex items-center justify-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-md p-6 sm:p-8 space-y-6">
         <div className="flex justify-between items-center mb-2 sm:mb-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">تسجيل الدخول باستخدام جوجل</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">تسجيل الدخول</h2>
           <ThemeToggle />
         </div>
 
-        <button
-          onClick={handleGoogleLogin}
-          type="button"
-          className="cursor-pointer w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md py-2 font-medium transition"
-        >
-          <FcGoogle className="text-xl" />
-          الدخول باستخدام Google
-        </button>
-
         <form onSubmit={handleLogin} className="space-y-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">أو تسجيل دخول</h2>
           <div>
             <label className="block mb-1 text-sm">اسم المستخدم أو الإيميل أو رقم الطالب</label>
             <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">

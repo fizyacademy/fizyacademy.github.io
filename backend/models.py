@@ -25,7 +25,9 @@ class User(db.Model):
     is_approved = db.Column(db.Boolean, default=False)
     gender = db.Column(db.String(10))
     avatar = db.Column(db.String(50))
-    is_complete = db.Column(db.Boolean, default=False)  # ✅ جديد
+    google_id = db.Column(db.String(100), unique=True)
+    google_email = db.Column(db.String(120))
+
 
     def to_dict(self):
         return {
@@ -45,7 +47,6 @@ class User(db.Model):
             "gender": self.gender,
             "avatar": self.avatar,
             "created_at": self.created_at.isoformat(),
-            "is_complete": self.is_complete
         }
 
 # جدول لتخزين التوكنات الملغاة (revoked)
