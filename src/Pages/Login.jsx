@@ -30,10 +30,7 @@ function Login() {
   };
 
   const handleGoogleLogin = () => {
-    const win = window.open("http://localhost:5000/auth/google-login", "_blank", "width=500,height=600");
-    if (!win) {
-      alert("يرجى السماح بالنوافذ المنبثقة (popups) لتسجيل الدخول بجوجل");
-    }
+    window.location.href = "http://localhost:5000/auth/google-login";
   };
 
   return (

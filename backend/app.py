@@ -2,14 +2,18 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, get_jwt_identity, get_jwt, verify_jwt_in_request
+from flask_jwt_extended import (
+    JWTManager,
+    get_jwt_identity,
+    get_jwt,
+    verify_jwt_in_request,
+)
 from config import Config, instance_dir
 from db import db
-from auth import auth_bp
+from auth import auth_bp, oauth
 from admin import admin_bp
-from models import User, TokenBlocklist
 from account import account_bp
-from auth import oauth
+from models import User, TokenBlocklist
 from werkzeug.security import generate_password_hash
 import os
 
@@ -20,10 +24,10 @@ def create_app():
     # تفعيل CORS للسماح بالكوكيز في بيئة التطوير
     CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 
-    # تهيئة قواعد البيانات و JWT
+    # تهيئة قواعد البيانات و JWT و OAuth
     db.init_app(app)
-    oauth.init_app(app)
     jwt = JWTManager(app)
+    oauth.init_app(app)
 
     # التحقق من إلغاء التوكن (Token Revoking)
     @jwt.token_in_blocklist_loader
@@ -38,11 +42,11 @@ def create_app():
             "/auth/login",
             "/auth/register",
             "/auth/google-login",
+            "/auth/google-callback",
             "/auth/complete-profile",
             "/auth/refresh",
-            "/auth/logout"
+            "/auth/logout",
         ]
-
         if request.path in public_routes or request.path.startswith("/static"):
             return
 
@@ -57,10 +61,9 @@ def create_app():
                         "redirect_to": "/complete-profile"
                     }), 403
         except Exception:
-            # لو التوكن مش موجود أو فيه خطأ، بنسيبه يوصل للصفحة اللي هيشوفها بنفسه (زي login)
-            pass
+            pass  # السماح للمستخدم غير المسجل بالوصول للصفحات العامة
 
-    # تسجيل الـ Blueprints
+    # تسجيل Blueprints
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(account_bp, url_prefix="/account")

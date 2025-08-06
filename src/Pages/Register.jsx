@@ -85,10 +85,7 @@ function Register() {
   };
 
   const handleGoogleRegister = () => {
-    const win = window.open("http://localhost:5000/auth/google-login", "_blank", "width=500,height=600");
-    if (!win) {
-      alert("يرجى السماح بالنوافذ المنبثقة (popups) لتسجيل الدخول بجوجل");
-    }
+    window.location.href = "http://localhost:5000/auth/google-login";
   };
 
 
@@ -102,6 +99,7 @@ function Register() {
           value={value}
           onChange={onChange}
           required
+          placeholder={label}
           className="w-full bg-transparent text-gray-800 dark:text-white py-3 focus:outline-none"
         />
         {type === "password" && (
@@ -129,7 +127,7 @@ function Register() {
             country="eg"
             value={value}
             onChange={onChange}
-            inputProps={{ name, required: true }}
+            inputProps={{ name, required: true, placeholder: label }}
             inputClass="!pl-[0px] !w-full !bg-transparent py-6 !text-gray-800 dark:!text-white !border-none !shadow-none !outline-none"
             containerClass="!w-full !bg-transparent !border-none !shadow-none"
             buttonClass="!bg-transparent !border-none mr-5 hover:!bg-transparent"

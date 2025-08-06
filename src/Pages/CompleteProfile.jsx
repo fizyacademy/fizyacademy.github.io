@@ -1,6 +1,4 @@
-// CompleteProfile.jsx
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -15,7 +13,7 @@ import { showError, showPromise } from "../components/Toast";
 function CompleteProfile() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
-
+  const [email, setEmail] = useState("");
   const [arabic_name, setArabicName] = useState("");
   const [password, setPassword] = useState("");
   const [studentPhone, setStudentPhone] = useState("");
@@ -24,6 +22,13 @@ function CompleteProfile() {
   const [gender, setGender] = useState("male");
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      if (user.email) setEmail(user.email);
+      if (user.student_phone) setStudentPhone(user.student_phone);
+    }
+  }, [user]);
 
   const handleComplete = async (e) => {
     e.preventDefault();
@@ -78,7 +83,7 @@ function CompleteProfile() {
     }
   };
 
-  const renderInput = (label, icon, type, value, onChange) => (
+  const renderInput = (label, icon, type, value, onChange, placeholder = "", readOnly = false) => (
     <div>
       <label className="block mb-1 text-sm sm:text-base text-gray-800 dark:text-white">{label}</label>
       <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
@@ -87,6 +92,8 @@ function CompleteProfile() {
           type={type === "password" ? (showPassword ? "text" : "password") : type}
           value={value}
           onChange={onChange}
+          placeholder={placeholder}
+          readOnly={readOnly}
           required
           className="w-full bg-transparent text-gray-800 dark:text-white focus:outline-none py-3"
         />
@@ -161,8 +168,8 @@ function CompleteProfile() {
             />
           </div>
 
-          {renderInput("البريد الإلكتروني", <FiMail />, "email", user?.email || "", () => {})}
-          {renderInput("الاسم بالعربية ثلاثي", <FiUser />, "text", arabic_name, (e) => setArabicName(e.target.value))}
+          {renderInput("البريد الإلكتروني", <FiMail />, "email", email, () => {}, "البريد الإلكتروني", true)}
+          {renderInput("الاسم بالعربية ثلاثي", <FiUser />, "text", arabic_name, (e) => setArabicName(e.target.value), "الاسم الكامل بالعربية")}
 
           {role === "student" && (
             <>
@@ -182,7 +189,7 @@ function CompleteProfile() {
             </>
           )}
 
-          {renderInput("انشاء كلمة مرور", <FiLock />, "password", password, (e) => setPassword(e.target.value))}
+          {renderInput("انشاء كلمة مرور", <FiLock />, "password", password, (e) => setPassword(e.target.value), "كلمة المرور")}
 
           <button
             type="submit"

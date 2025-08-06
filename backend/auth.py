@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     jwt_required,
     set_access_cookies,
     set_refresh_cookies,
-    get_jwt
+    get_jwt,
 )
 from authlib.integrations.flask_client import OAuth
 from models import User, TokenBlocklist
@@ -54,9 +54,16 @@ def google_login_redirect():
 @auth_bp.route("google-callback")
 def google_callback():
     try:
-        token = google.authorize_access_token()
-        resp = google.get("userinfo")
+        token = google.authorize_access_token(include_nonce=False)
+
+        # استدعاء metadata بطريقة صحيحة
+        userinfo_endpoint = google.load_server_metadata().get("userinfo_endpoint")
+        if not userinfo_endpoint:
+            return jsonify({"message": "لم يتم العثور على userinfo endpoint"}), 400
+
+        resp = google.get(userinfo_endpoint)
         user_info = resp.json()
+
         email = user_info.get("email")
         name = user_info.get("name")
 
@@ -78,6 +85,7 @@ def google_callback():
 
     except Exception as e:
         return jsonify({"message": "حدث خطأ أثناء تسجيل الدخول بجوجل", "error": str(e)}), 500
+
 
 # ------------------ Auth Endpoints ------------------
 
