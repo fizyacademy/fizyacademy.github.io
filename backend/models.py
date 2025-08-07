@@ -25,9 +25,9 @@ class User(db.Model):
     is_approved = db.Column(db.Boolean, default=False)
     gender = db.Column(db.String(10))
     avatar = db.Column(db.String(50))
+    # الحقول الجديدة لجوجل
     google_id = db.Column(db.String(100), unique=True)
     google_email = db.Column(db.String(120))
-
 
     def to_dict(self):
         return {
@@ -46,10 +46,11 @@ class User(db.Model):
             "is_approved": self.is_approved,
             "gender": self.gender,
             "avatar": self.avatar,
+            "google_id": self.google_id,
+            "google_email": self.google_email,
             "created_at": self.created_at.isoformat(),
         }
 
-# جدول لتخزين التوكنات الملغاة (revoked)
 class TokenBlocklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(36), nullable=False, index=True)

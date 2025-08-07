@@ -1,7 +1,8 @@
 # auth.py
+import os
 import random
 from datetime import datetime
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, redirect, url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (
     create_access_token,
@@ -11,11 +12,17 @@ from flask_jwt_extended import (
     set_access_cookies,
     set_refresh_cookies,
     get_jwt,
+    current_user
 )
+from authlib.integrations.flask_client import OAuth
 from models import User, TokenBlocklist
 from db import db
 
 auth_bp = Blueprint("auth", __name__)
+oauth = OAuth()  # سيتم تهيئته في app.py
+
+def get_google_client():
+    return current_app.extensions["authlib.integrations.flask_client"]._clients["google"]
 
 # ------------------ Helpers ------------------
 def generate_coupon_code(username):
@@ -32,8 +39,73 @@ def generate_unique_user_code():
         if not User.query.filter_by(user_code=code).first():
             return code
 
-# ------------------ Auth Endpoints ------------------
+# ------------------ Google OAuth ------------------
+@auth_bp.route("/google-link")
+@jwt_required()
+def google_link():
+    redirect_uri = url_for("auth.google_link_callback", _external=True)
+    return get_google_client().authorize_redirect(redirect_uri)
 
+@auth_bp.route("/google-link/callback")
+@jwt_required()
+def google_link_callback():
+    token = get_google_client().authorize_access_token()
+    userinfo = get_google_client().get("https://openidconnect.googleapis.com/v1/userinfo").json()
+    google_id = userinfo["sub"]
+    google_email = userinfo.get("email")
+
+    # لو فيه حساب تاني أصلاً رابط نفس Google ID
+    if User.query.filter(User.google_id == google_id, User.id != get_jwt_identity()).first():
+        return jsonify({"message": "هذا الحساب في جوجل مرتبط بالفعل بحساب آخر"}), 400
+
+    # لو فيه حساب تاني بنفس Google Email
+    if User.query.filter(User.google_email == google_email, User.id != get_jwt_identity()).first():
+        return jsonify({"message": "هذا البريد في جوجل مربوط بالفعل بحساب آخر"}), 400
+
+    user = User.query.get(get_jwt_identity())
+    if user.google_id:
+        return jsonify({"message": "هذا الحساب مرتبط بالفعل بجوجل"}), 400
+
+    user.google_id = google_id
+    user.google_email = google_email
+    db.session.commit()
+
+    return jsonify({"message": "تم ربط حساب جوجل بنجاح"})
+
+@auth_bp.route('/auth/unlink-google', methods=['POST'])
+@jwt_required()
+def unlink_google():
+    if not current_user.google_id:
+        return jsonify({"message": "لا يوجد حساب جوجل مربوط"}), 400
+    
+    current_user.google_id = None
+    db.session.commit()
+    return jsonify({"message": "تم إلغاء الربط بنجاح"})
+
+@auth_bp.route("/google-login")
+def google_login():
+    redirect_uri = url_for("auth.google_login_callback", _external=True)
+    return get_google_client().authorize_redirect(redirect_uri)
+
+@auth_bp.route("/google-login/callback")
+def google_login_callback():
+    token = get_google_client().authorize_access_token()
+    userinfo = get_google_client().get("https://openidconnect.googleapis.com/v1/userinfo").json()
+    google_id = userinfo["sub"]
+
+    user = User.query.filter_by(google_id=google_id).first()
+    if not user:
+        return jsonify({"message": "هذا الحساب في جوجل غير مربوط بأي حساب لدينا"}), 404
+
+    access_token = create_access_token(identity=user.id)
+    refresh_token = create_refresh_token(identity=user.id)
+
+    response = redirect("http://localhost:5173/")
+    set_access_cookies(response, access_token)
+    set_refresh_cookies(response, refresh_token)
+    return response
+
+# ------------------ Auth Endpoints ------------------
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()

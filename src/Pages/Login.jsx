@@ -35,6 +35,15 @@ function Login() {
           <h2 className="text-xl sm:text-2xl font-bold text-violet-700 dark:text-violet-300">تسجيل الدخول</h2>
           <ThemeToggle />
         </div>
+        <button
+          type="button"
+          onClick={() => window.location.href = "http://localhost:5000/auth/google-login"}
+          className="w-full flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 py-3 rounded-md font-semibold transition cursor-pointer"
+        >
+          <img src="/google-icon.svg" alt="google" className="w-5 h-5" />
+          تسجيل الدخول بواسطة جوجل
+        </button>
+
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>

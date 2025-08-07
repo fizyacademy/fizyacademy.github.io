@@ -10,7 +10,7 @@ from flask_jwt_extended import (
 )
 from config import Config, instance_dir
 from db import db
-from auth import auth_bp
+from auth import auth_bp, oauth  # <-- استدعاء oauth من auth
 from admin import admin_bp
 from account import account_bp
 from models import User, TokenBlocklist
@@ -28,6 +28,20 @@ def create_app():
     db.init_app(app)
     jwt = JWTManager(app)
 
+    # --- تسجيل Google OAuth هنا ---
+    oauth.init_app(app)
+    oauth.register(
+        name="google",
+        client_id=os.getenv("GOOGLE_CLIENT_ID"),
+        client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={
+            # مهم جدًا يكون في openid علشان نقدر نجيب الـ sub
+            "scope": "openid email profile"
+        },
+    )
+    # -------------------------------
+
     # التحقق من إلغاء التوكن (Token Revoking)
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
@@ -40,9 +54,10 @@ def create_app():
         public_routes = [
             "/auth/login",
             "/auth/register",
+            "/auth/google-link",
             "/auth/google-login",
-            "/auth/google-callback",
-            "/auth/complete-profile",
+            "/auth/google-link/callback",
+            "/auth/google-login/callback",
             "/auth/refresh",
             "/auth/logout",
         ]

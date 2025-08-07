@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-  FiUser, FiMail, FiPhone, FiCheck, FiEdit, FiLock, FiBook
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiCheck,
+  FiEdit,
+  FiLock,
+  FiBook
 } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import PhoneInput from "react-phone-input-2";
@@ -14,6 +20,8 @@ import BackButton from "../components/BackButton";
 import { fetchWithAuth } from "../utils";
 import { useAuth } from "../AuthContext";
 import { showPromise, showInfo } from "../components/Toast";
+import GoogleLinkModal from "../components/GoogleLinkModal";
+import { IoLogoGoogle } from "react-icons/io";
 
 const stageOptions = [
   { value: "1st_sec", label: "الصف الأول الثانوي" },
@@ -40,6 +48,7 @@ const AccountSettings = () => {
   const [editFields, setEditFields] = useState({});
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -68,9 +77,9 @@ const AccountSettings = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleUpdate = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const isAvatarChanged = formData.avatar !== user.avatar;
+    const isAvatarChanged = formData.avatar !== user.avatar;
     const hasChanges =
       isAvatarChanged || Object.keys(editFields).some((key) => editFields[key]);
 
@@ -88,7 +97,6 @@ const AccountSettings = () => {
         });
 
         if (!data.user) {
-          // رمي خطأ علشان toast.promise يعرف إنه fail
           throw new Error(data.message || "فشل في تحديث البيانات");
         }
 
@@ -104,14 +112,16 @@ const AccountSettings = () => {
     );
   };
 
-
   if (!user) return <Loading />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-10 flex justify-center items-center text-gray-900 dark:text-white">
       <div className="bg-white/70 dark:bg-gray-900/80 backdrop-blur rounded-xl shadow-xl w-full max-w-5xl p-8 flex flex-col md:flex-row gap-10">
         <div className="flex flex-col items-center">
-          <div className="relative group cursor-pointer" onClick={() => setShowAvatarModal(true)}>
+          <div
+            className="relative group cursor-pointer"
+            onClick={() => setShowAvatarModal(true)}
+          >
             <img
               src={avatarImages[formData.avatar]}
               alt="avatar"
@@ -125,7 +135,9 @@ const AccountSettings = () => {
 
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">إعدادات الحساب</h2>
+            <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">
+              إعدادات الحساب
+            </h2>
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <BackButton />
@@ -155,10 +167,20 @@ const AccountSettings = () => {
               <FiLock /> تغيير كلمة المرور
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowGoogleModal(true)}
+            className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-md font-semibold transition cursor-pointer"
+          >
+            <IoLogoGoogle size={20} />
+            {user.google_id ? "إدارة ربط جوجل" : "ربط حساب جوجل"}
+          </button>
         </div>
       </div>
 
-      {showPasswordModal && <PasswordModal onClose={() => setShowPasswordModal(false)} />}
+      {showPasswordModal && (
+        <PasswordModal onClose={() => setShowPasswordModal(false)} />
+      )}
       {showAvatarModal && (
         <AvatarModal
           currentAvatar={formData.avatar}
@@ -167,6 +189,13 @@ const AccountSettings = () => {
             setShowAvatarModal(false);
           }}
           onClose={() => setShowAvatarModal(false)}
+        />
+      )}
+      {showGoogleModal && (
+        <GoogleLinkModal
+          onClose={() => setShowGoogleModal(false)}
+          user={user}
+          setUser={setUser}
         />
       )}
     </div>
@@ -179,7 +208,9 @@ const AccountSettings = () => {
       <div>
         <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
         <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-3 shadow-inner">
-          <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
+          <span className="text-xl text-violet-600 dark:text-violet-400">
+            {icon}
+          </span>
           <input
             type={type}
             name={name}
@@ -191,7 +222,11 @@ const AccountSettings = () => {
           {isEditable(name) && (
             <>
               <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-              <button type="button" onClick={() => toggleEdit(name)} className="text-sm text-blue-600 underline cursor-pointer">
+              <button
+                type="button"
+                onClick={() => toggleEdit(name)}
+                className="text-sm text-blue-600 underline cursor-pointer"
+              >
                 {editFields[name] ? <IoClose /> : <FiEdit />}
               </button>
             </>
@@ -206,7 +241,9 @@ const AccountSettings = () => {
       <div>
         <label className="block mb-1 text-gray-800 dark:text-white">{label}</label>
         <div className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-300 dark:border-gray-600 rounded-md px-2 shadow-inner">
-          <span className="text-xl text-violet-600 dark:text-violet-400">{icon}</span>
+          <span className="text-xl text-violet-600 dark:text-violet-400">
+            {icon}
+          </span>
           <div className="w-full">
             <PhoneInput
               country="eg"
@@ -249,7 +286,9 @@ const AccountSettings = () => {
   function renderStage() {
     return (
       <div>
-        <label className="block mb-1 text-gray-800 dark:text-white">المرحلة الدراسية</label>
+        <label className="block mb-1 text-gray-800 dark:text-white">
+          المرحلة الدراسية
+        </label>
         <CustomSelect
           value={formData.stage}
           onChange={(val) => setFormData({ ...formData, stage: val })}
